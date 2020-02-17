@@ -165,9 +165,62 @@ class CyprusWeather(WeatherEntity):
     @property
     def state_attributes(self):
         """Return the state attributes."""
-        #data = {}
-        #Baseclass entries
-        data = WeatherEntity.state_attributes(self)
+        data = {}
+        
+        if self.temperature is not None:
+            data[ATTR_WEATHER_TEMPERATURE] = show_temp(
+                self.hass, self.temperature, self.temperature_unit, self.precision
+            )
+
+        humidity = self.humidity
+        if humidity is not None:
+            data[ATTR_WEATHER_HUMIDITY] = round(humidity)
+
+        ozone = self.ozone
+        if ozone is not None:
+            data[ATTR_WEATHER_OZONE] = ozone
+
+        pressure = self.pressure
+        if pressure is not None:
+            data[ATTR_WEATHER_PRESSURE] = pressure
+
+        wind_bearing = self.wind_bearing
+        if wind_bearing is not None:
+            data[ATTR_WEATHER_WIND_BEARING] = wind_bearing
+
+        wind_speed = self.wind_speed
+        if wind_speed is not None:
+            data[ATTR_WEATHER_WIND_SPEED] = wind_speed
+
+        visibility = self.visibility
+        if visibility is not None:
+            data[ATTR_WEATHER_VISIBILITY] = visibility
+
+        attribution = self.attribution
+        if attribution is not None:
+            data[ATTR_WEATHER_ATTRIBUTION] = attribution
+
+        if self.forecast is not None:
+            forecast = []
+            for forecast_entry in self.forecast:
+                forecast_entry = dict(forecast_entry)
+                forecast_entry[ATTR_FORECAST_TEMP] = show_temp(
+                    self.hass,
+                    forecast_entry[ATTR_FORECAST_TEMP],
+                    self.temperature_unit,
+                    self.precision,
+                )
+                if ATTR_FORECAST_TEMP_LOW in forecast_entry:
+                    forecast_entry[ATTR_FORECAST_TEMP_LOW] = show_temp(
+                        self.hass,
+                        forecast_entry[ATTR_FORECAST_TEMP_LOW],
+                        self.temperature_unit,
+                        self.precision,
+                    )
+                forecast.append(forecast_entry)
+
+            data[ATTR_FORECAST] = forecast
+
         #add our own custom shit
         data["forecast_temp_low"]=5
         data["forecast_temp_high"]=45
