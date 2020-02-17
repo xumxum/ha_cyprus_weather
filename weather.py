@@ -41,7 +41,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     name = config.get(CONF_NAME)
     city = config.get("city")
 
-    add_entities([CyprusWeather(name, city)], True)
+    add_entities([CyprusWeather(hass,  name, city)], True)
     _LOGGER.debug(
         "Entity created for city (%s)", city
     )
@@ -50,12 +50,13 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 class CyprusWeather(WeatherEntity):
     """Representation of a weather entity."""
 
-    def __init__(self, name, city):
+    def __init__(self, hass,  name, city):
         """Initialize Cyprus weather."""
         _LOGGER.debug("Creating instance of CyprusWeather, using parameters")
         _LOGGER.debug("name\t%s", name)
         _LOGGER.debug("city\t%s", city)
 
+        self.hass = hass
         self._name = name
         self._city = city
 
@@ -164,7 +165,10 @@ class CyprusWeather(WeatherEntity):
     @property
     def state_attributes(self):
         """Return the state attributes."""
-        data = {}
+        #data = {}
+        #Baseclass entries
+        data = WeatherEntity.state_attributes()
+        #add our own custom shit
         data["forecast_temp_low"]=5
         data["forecast_temp_high"]=45
         return data
