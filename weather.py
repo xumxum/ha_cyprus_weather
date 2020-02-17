@@ -1,7 +1,7 @@
-"""AEMET: Custom Weather Component for AEMET (Agencia Estatal de Metereologia)"""
+"""Cyprus Weather Component"""
 
 import logging
-from datetime import datetime
+#from datetime import datetime
 from datetime import timedelta
 
 import homeassistant.helpers.config_validation as cv
@@ -13,9 +13,6 @@ from homeassistant.const import (
 )
 from homeassistant.const import PRECISION_TENTHS
 from homeassistant.util import Throttle
-
-#from .aemet import AemetData
-#from .const import *
 
 from .cyprus_weather_org import *
 
