@@ -42,6 +42,17 @@ def getData(url):
     weatherData["Current.WindDirection"] = w.group(2)
 
     weatherData["Current.UVIndex"] = re.compile('<th>UV Index:</th>\s+<td>(.+?)</td>').findall(currentDetails_s)[0]
+    
+    #forecast_s = str(cwMain.find_all("div",class_="hourly")[0])
+    forecasts_v = cwMain.find_all("div",class_="hour")
+    for forecast_entry_s in forecasts_v:
+        pprint(forecast_entry_s)
+        h = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
+        pprint(h)
+        d = re.compile('/>\r\n\s+(\d+).+\r\n').findall(str(forecast_entry_s))[0]
+        #d = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
+        pprint(d)
+    #pprint(h)
 
     #weatherData["Current.Condition"]="windy"
 
