@@ -167,7 +167,7 @@ class CyprusWeather(WeatherEntity):
         """Return the state attributes."""
         #data = {}
         #Baseclass entries
-        data = WeatherEntity.state_attributes()
+        data = WeatherEntity.state_attributes(self)
         #add our own custom shit
         data["forecast_temp_low"]=5
         data["forecast_temp_high"]=45
