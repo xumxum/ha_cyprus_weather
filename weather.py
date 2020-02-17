@@ -5,9 +5,12 @@ import logging
 from datetime import timedelta
 
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.temperature import display_temp as show_temp
+
 import voluptuous as vol
 from homeassistant.components.weather import PLATFORM_SCHEMA
 from homeassistant.components.weather import WeatherEntity
+
 from homeassistant.const import (
     CONF_NAME,
 )
