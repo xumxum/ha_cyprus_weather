@@ -160,6 +160,15 @@ class CyprusWeather(WeatherEntity):
     windy-variant
     exceptional
     """
+    
+    @property
+    def state_attributes(self):
+        """Return the state attributes."""
+        data = {}
+        data["forecast_temp_low"]=5
+        data["forecast_temp_high"]=45
+        return data
+    
 
     """Called every MIN_TIME_BETWEEN_UPDATES , updates the data values"""
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
