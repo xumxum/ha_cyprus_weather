@@ -12,11 +12,11 @@ LIM        = 'https://www.cyprus-weather.org/limassol-weather-forecast/'
 
 
 def getData(url):
-    #page = requests.get(url)
-    #content = page.content
+    page = requests.get(url)
+    content = page.content
 
-    with open('/tmp/lim.html', 'r') as content_file:
-        content = content_file.read()        
+#    with open('/tmp/lim.html', 'r') as content_file:
+#        content = content_file.read()        
 
     weatherData = {}
 
@@ -71,6 +71,7 @@ def getData(url):
     re_forecast_temphigh = re.compile('<div class="temp temp-high">(\d+)')
     re_forecast_templow = re.compile('<div class="temp temp-low">(\d+)')
     
+    prefix=""
     for i in range(2):
         forecast_s = str(today_forecast_periods[i])
         prefix = "To" + (prefix_v[i]).lower()
@@ -79,8 +80,10 @@ def getData(url):
         weatherData["Forecast." + prefix +".ChanceOfRain"] = re_forecast_chanceofrain.findall(forecast_s)[0]
         weatherData["Forecast." + prefix +".Wind"] = re_forecast_wind.findall(forecast_s)[0]
 
-    weatherData["Forecast." + prefix_v[0] + ".TempHigh"] = re_forecast_temphigh.findall( str(today_forecast_periods[0]) )[0]
-    weatherData["Forecast." + prefix_v[1] + ".TempLow"] = re_forecast_templow.findall( str(today_forecast_periods[1]) )[0]
+        if i == 0:
+            weatherData["Forecast." + prefix + ".TempHigh"] = re_forecast_temphigh.findall( str(today_forecast_periods[0]) )[0]
+        else:
+            weatherData["Forecast." + prefix + ".TempLow"] = re_forecast_templow.findall( str(today_forecast_periods[1]) )[0]
     #pprint(weatherData)
     
     #dayly_forecast = cwMain.find_all("div",class_="forecast")[0]
@@ -96,10 +99,13 @@ def getData(url):
     for day_container_entity in day_container:
         #day-date
         #pprint(day_container_entity)
+        day_forecast_dict = {}
+        
         day_date_s = str( day_container_entity.find_all("div",class_="day-date")[0] )
         #pprint(day_date_s)
         d = re.compile('<span>(.+?)\.\s*(\d+)(.+?)<').search(day_date_s)
         f_date = d.group(1) + " " + d.group(2) 
+        day_forecast_dict["Date"] = f_date
         #pprint(f_date)
         
         day_forecast = day_container_entity.find_all("div",class_="day-forecast")[0] 
@@ -107,18 +113,25 @@ def getData(url):
         
         for i in range(2):
             forecast_s = str(forecast_periods[i])
-            prefix0 = "Day" + str(day_counter+1)  + "."
-            prefix = prefix0  + prefix_v[i]
-                    
-            weatherData["Forecast." + prefix +".Description"] = re_forecast_description.findall(forecast_s)[0]
-            weatherData["Forecast." + prefix +".ChanceOfRain"] = re_forecast_chanceofrain.findall(forecast_s)[0]
-            weatherData["Forecast." + prefix +".Wind"] = re_forecast_wind.findall(forecast_s)[0]
+            prefix = prefix_v[i] +"."
 
-        weatherData["Forecast." + prefix0 +prefix_v[0] + ".TempHigh"] = re_forecast_temphigh.findall( str(today_forecast_periods[0]) )[0]
-        weatherData["Forecast." + prefix0 +prefix_v[1] + ".TempLow"] = re_forecast_templow.findall( str(today_forecast_periods[1]) )[0]
+            description = re_forecast_description.findall(forecast_s)[0]
+            chanceOfRain = re_forecast_chanceofrain.findall(forecast_s)[0]
+            wind = re_forecast_wind.findall(forecast_s)[0]
 
+            day_forecast_dict[prefix+"Description"] = description
+            day_forecast_dict[prefix+"ChanceOfRain"] = chanceOfRain
+            day_forecast_dict[prefix+"Wind"] = wind
+            
+            if i == 0:
+                day_forecast_dict[prefix+"TempHigh"] = re_forecast_temphigh.findall( forecast_s )[0]
+            else:
+                day_forecast_dict[prefix+"TempLow"] = re_forecast_templow.findall( forecast_s )[0]
+       
+        forecast_dayly[f_date] = day_forecast_dict
         day_counter = day_counter+1
 
+    weatherData["Forecast"] = forecast_dayly
     return weatherData
 
 _weatherData = getData(LIM)
