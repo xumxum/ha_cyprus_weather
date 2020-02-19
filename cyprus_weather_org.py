@@ -65,16 +65,22 @@ def getData(url):
     #first is daytime, 2nd is nighttime
     today_forecast_periods = today_forecast.find_all("div",class_="period") 
     prefix_v=['Day', 'Night']
+    re_forecast_description = re.compile('<div class="description">(.+?)<')
+    re_forecast_chanceofrain = re.compile('Chance of Rain: (\d+)%')
+    re_forecast_wind = re.compile('(\d+) km\/h')
+    re_forecast_temphigh = re.compile('<div class="temp temp-high">(\d+)')
+    re_forecast_templow = re.compile('<div class="temp temp-low">(\d+)')
+    
     for i in range(2):
         forecast_s = str(today_forecast_periods[i])
-        prefix = prefix_v[i]
+        prefix = "To" + (prefix_v[i]).lower()
                 
-        weatherData["Forecast." + prefix +".Description"] = re.compile('<div class="description">(.+?)<').findall(forecast_s)[0]
-        weatherData["Forecast." + prefix +".ChanceOfRain"] = re.compile('Chance of Rain: (\d+)%').findall(forecast_s)[0]
-        weatherData["Forecast." + prefix +".Wind"] = re.compile('(\d+) km\/h').findall(forecast_s)[0]
+        weatherData["Forecast." + prefix +".Description"] = re_forecast_description.findall(forecast_s)[0]
+        weatherData["Forecast." + prefix +".ChanceOfRain"] = re_forecast_chanceofrain.findall(forecast_s)[0]
+        weatherData["Forecast." + prefix +".Wind"] = re_forecast_wind.findall(forecast_s)[0]
 
-    weatherData["Forecast." + prefix_v[0] + ".TempHigh"] = re.compile('<div class="temp temp-high">(\d+)').findall( str(today_forecast_periods[0]) )[0]
-    weatherData["Forecast." + prefix_v[1] + ".TempLow"] = re.compile('<div class="temp temp-low">(\d+)').findall( str(today_forecast_periods[1]) )[0]
+    weatherData["Forecast." + prefix_v[0] + ".TempHigh"] = re_forecast_temphigh.findall( str(today_forecast_periods[0]) )[0]
+    weatherData["Forecast." + prefix_v[1] + ".TempLow"] = re_forecast_templow.findall( str(today_forecast_periods[1]) )[0]
     #pprint(weatherData)
     
     #dayly_forecast = cwMain.find_all("div",class_="forecast")[0]
@@ -86,14 +92,32 @@ def getData(url):
     day_container = dayly_forecast.find_all("div",class_="day-container")
 
     forecast_dayly={}
+    day_counter = 0
     for day_container_entity in day_container:
         #day-date
         #pprint(day_container_entity)
         day_date_s = str( day_container_entity.find_all("div",class_="day-date")[0] )
-        f_date = re.compile('<span>(.+?)<').findall(day_date_s)[0]
+        #pprint(day_date_s)
+        d = re.compile('<span>(.+?)\.\s*(\d+)(.+?)<').search(day_date_s)
+        f_date = d.group(1) + " " + d.group(2) 
+        #pprint(f_date)
         
-        pprint(f_date)
+        day_forecast = day_container_entity.find_all("div",class_="day-forecast")[0] 
+        forecast_periods = day_forecast.find_all("div",class_="period") 
+        
+        for i in range(2):
+            forecast_s = str(forecast_periods[i])
+            prefix0 = "Day" + str(day_counter+1)  + "."
+            prefix = prefix0  + prefix_v[i]
+                    
+            weatherData["Forecast." + prefix +".Description"] = re_forecast_description.findall(forecast_s)[0]
+            weatherData["Forecast." + prefix +".ChanceOfRain"] = re_forecast_chanceofrain.findall(forecast_s)[0]
+            weatherData["Forecast." + prefix +".Wind"] = re_forecast_wind.findall(forecast_s)[0]
 
+        weatherData["Forecast." + prefix0 +prefix_v[0] + ".TempHigh"] = re_forecast_temphigh.findall( str(today_forecast_periods[0]) )[0]
+        weatherData["Forecast." + prefix0 +prefix_v[1] + ".TempLow"] = re_forecast_templow.findall( str(today_forecast_periods[1]) )[0]
+
+        day_counter = day_counter+1
 
     return weatherData
 
