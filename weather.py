@@ -173,11 +173,12 @@ class CyprusWeather(WeatherEntity):
     def forecast(self):
         """Return the forecast array."""
         rez = []
-        for k in self._weatherData["Forecast"]:
+        forecast_d = self._weatherData["Forecast"]
+        for k in forecast_d:
             forecast_entry = {
-                ATTR_FORECAST_TIME: self._weatherData[k]["Date"],
-                ATTR_FORECAST_TEMP: int(self._weatherData[k]["Day.TempHigh"]),
-                ATTR_FORECAST_TEMP_LOW: int(self._weatherData[k]["Night.TempLow"])
+                ATTR_FORECAST_TIME: forecast_d[k]["Date"],
+                ATTR_FORECAST_TEMP: int(forecast_d[k]["Day.TempHigh"]),
+                ATTR_FORECAST_TEMP_LOW: int(forecast_d[k]["Night.TempLow"])
                 #ATTR_FORECAST_CONDITION: self._weatherData[k]["Night.TempLow"]
             }
         rez.append(forecast_entry)
