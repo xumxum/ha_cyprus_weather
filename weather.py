@@ -26,6 +26,7 @@ DEFAULT_NAME = "cyweather"
 CONF_SET_CITY = "city"
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=10)
 
+ 
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
@@ -143,26 +144,7 @@ class CyprusWeather(WeatherEntity):
         except:
             return None
 
-    """
-    Home assistant knows only about these states so it can map it to the icon
-    Otherwise won't display icon just the test 
 
-    clear-night
-    cloudy
-    fog
-    hail
-    lightning
-    lightning-rainy
-    partlycloudy
-    pouring
-    rainy
-    snowy
-    snowy-rainy
-    sunny
-    windy
-    windy-variant
-    exceptional
-    """
 #    
 #                        ATTR_FORECAST_TIME: v["date"],
 #                    ATTR_FORECAST_TEMP: int(v["high"]),
@@ -178,8 +160,8 @@ class CyprusWeather(WeatherEntity):
             forecast_entry = {
                 ATTR_FORECAST_TIME: forecast_d[k]["Date"],
                 ATTR_FORECAST_TEMP: int(forecast_d[k]["Day.TempHigh"]),
-                ATTR_FORECAST_TEMP_LOW: int(forecast_d[k]["Night.TempLow"])
-                #ATTR_FORECAST_CONDITION: self._weatherData[k]["Night.TempLow"]
+                ATTR_FORECAST_TEMP_LOW: int(forecast_d[k]["Night.TempLow"]), 
+                ATTR_FORECAST_CONDITION: self._weatherData[k]["Condition"]
             }
             rez.append(forecast_entry)
         

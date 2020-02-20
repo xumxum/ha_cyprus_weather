@@ -11,6 +11,50 @@ BASE_URL   = 'https://www.cyprus-weather.org'
 LIM        = 'https://www.cyprus-weather.org/limassol-weather-forecast/'
 
 
+"""
+Home assistant knows only about these states so it can map it to the icon
+Otherwise won't display icon just the test 
+Not sure where should be but better to return string then number for condition
+
+clear-night
+cloudy
+fog
+hail
+lightning
+lightning-rainy
+partlycloudy
+pouring
+rainy
+snowy
+snowy-rainy
+sunny
+windy
+windy-variant
+exceptional
+"""
+conditions = {
+    5:"windy",  #not clear if this is it
+    32:"windy",  #not clear if this is it
+    25:"hail", 
+    26:"hail", 
+    29:"snowy-rainy", 
+    33:"clear-night", 
+    34:"clear-night"
+}
+
+for key in [1, 2, 30, 31,]:
+    conditions[key] = "sunny"
+for key in [7, 8, 11, 37,]:
+    conditions[key] = "cloudy"    
+for key in [3, 4, 6,  35,  36,  38]:
+    conditions[key] = "partlycloudy"    
+for key in [12, 13, 14,  18,  39,  40]:
+    conditions[key] = "rainy"
+for key in [15, 16,  17, 41 ,  42]:
+    conditions[key] = "lightning"    
+for key in [19,  20,  21,  22,  23,  24,  43,  44]:
+    conditions[key] = "snowy"    
+    
 def getData(url):
     page = requests.get(url)
     content = page.content
@@ -20,11 +64,20 @@ def getData(url):
 
     weatherData = {}
 
+    re_condition_nr = re.compile('(\d+)\.svg')
+    re_forecast_description = re.compile('<div class="description">(.+?)<')
+    re_forecast_chanceofrain = re.compile('Chance of Rain: (\d+)%')
+    re_forecast_wind = re.compile('(\d+) km\/h')
+    re_forecast_temphigh = re.compile('<div class="temp temp-high">(\d+)')
+    re_forecast_templow = re.compile('<div class="temp temp-low">(\d+)')
+
     soup = BeautifulSoup(content, 'html.parser')        
     cwMain = soup.find(id="cwMain")
 
     currentIcon_s = str(cwMain.find_all("div",class_="currentIcon")[0])
-    weatherData["Current.Condition"]=(re.compile('alt="(.+?)"').findall(currentIcon_s)[0]).lower()
+    weatherData["Current.Description"]=(re.compile('alt="(.+?)"').findall(currentIcon_s)[0]).lower()
+    condition_nr = re_condition_nr.findall(currentIcon_s)[0]
+    weatherData["Current.Condition"]=conditions[ int (condition_nr) ]
     weatherData["Current.OutlookIcon"]=BASE_URL + re.compile('src="(.+?)"').findall(currentIcon_s)[0]
 
     currentTemp_s = str(cwMain.find_all("div",class_="currentTemp")[0])    
@@ -65,11 +118,7 @@ def getData(url):
     #first is daytime, 2nd is nighttime
     today_forecast_periods = today_forecast.find_all("div",class_="period") 
     prefix_v=['Day', 'Night']
-    re_forecast_description = re.compile('<div class="description">(.+?)<')
-    re_forecast_chanceofrain = re.compile('Chance of Rain: (\d+)%')
-    re_forecast_wind = re.compile('(\d+) km\/h')
-    re_forecast_temphigh = re.compile('<div class="temp temp-high">(\d+)')
-    re_forecast_templow = re.compile('<div class="temp temp-low">(\d+)')
+
     
     prefix=""
     for i in range(2):
@@ -81,7 +130,7 @@ def getData(url):
         weatherData["Forecast." + prefix +".Wind"] = re_forecast_wind.findall(forecast_s)[0]
 
         if i == 0:
-            weatherData["Forecast." + prefix + ".TempHigh"] = re_forecast_temphigh.findall( str(today_forecast_periods[0]) )[0]
+            weatherData["Forecast." + prefix + ".TempHigh"] = re_forecast_temphigh.findall( str(today_forecast_periods[0]) )[0]            
         else:
             weatherData["Forecast." + prefix + ".TempLow"] = re_forecast_templow.findall( str(today_forecast_periods[1]) )[0]
     #pprint(weatherData)
@@ -125,6 +174,8 @@ def getData(url):
             
             if i == 0:
                 day_forecast_dict[prefix+"TempHigh"] = re_forecast_temphigh.findall( forecast_s )[0]
+                #condition we take from day 
+                day_forecast_dict[prefix+"Condition"] = conditions[ int(re_condition_nr.findall( forecast_s )[0]) ]
             else:
                 day_forecast_dict[prefix+"TempLow"] = re_forecast_templow.findall( forecast_s )[0]
        
