@@ -228,8 +228,9 @@ class CyprusWeather(WeatherEntity):
             data[ATTR_FORECAST] = forecast
 
         #add our own custom shit
-        data["forecast_temp_low"]=5
-        data["forecast_temp_high"]=45
+        data["forecast_temp_high"] = self._weatherData["Forecast.Today.TempHigh"]
+        data["forecast_temp_low"] = self._weatherData["Forecast.Tonight.TempLow"]
+        
         return data
     
 
