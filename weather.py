@@ -161,7 +161,7 @@ class CyprusWeather(WeatherEntity):
                 ATTR_FORECAST_TIME: forecast_d[k]["Date"],
                 ATTR_FORECAST_TEMP: int(forecast_d[k]["Day.TempHigh"]),
                 ATTR_FORECAST_TEMP_LOW: int(forecast_d[k]["Night.TempLow"]), 
-                ATTR_FORECAST_CONDITION: forecast_d[k]["Condition"]
+                ATTR_FORECAST_CONDITION: forecast_d[k]["Day.Condition"] # we show daytime forecast condition not night?!!
             }
             rez.append(forecast_entry)
         

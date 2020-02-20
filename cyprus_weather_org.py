@@ -171,11 +171,12 @@ def getData(url):
             day_forecast_dict[prefix+"Description"] = description
             day_forecast_dict[prefix+"ChanceOfRain"] = chanceOfRain
             day_forecast_dict[prefix+"Wind"] = wind
+            day_forecast_dict[prefix+"Condition"] = conditions[ int(re_condition_nr.findall( forecast_s )[0]) ]
             
             if i == 0:
                 day_forecast_dict[prefix+"TempHigh"] = re_forecast_temphigh.findall( forecast_s )[0]
                 #condition we take from day 
-                day_forecast_dict[prefix+"Condition"] = conditions[ int(re_condition_nr.findall( forecast_s )[0]) ]
+                #day_forecast_dict[prefix+"Condition"] = conditions[ int(re_condition_nr.findall( forecast_s )[0]) ]
             else:
                 day_forecast_dict[prefix+"TempLow"] = re_forecast_templow.findall( forecast_s )[0]
        
