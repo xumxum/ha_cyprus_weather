@@ -163,7 +163,27 @@ class CyprusWeather(WeatherEntity):
     windy-variant
     exceptional
     """
+#    
+#                        ATTR_FORECAST_TIME: v["date"],
+#                    ATTR_FORECAST_TEMP: int(v["high"]),
+#                    ATTR_FORECAST_TEMP_LOW: int(v["low"]),
+#                    ATTR_FORECAST_CONDITION: self.hass.data[DATA_CONDITION][
     
+    @property
+    def forecast(self):
+        """Return the forecast array."""
+        rez = []
+        for k in self._weatherData["Forecast"]:
+            forecast_entry = {
+                ATTR_FORECAST_TIME: self._weatherData[k]["Date"],
+                ATTR_FORECAST_TEMP: int(self._weatherData[k]["Day.TempHigh"]),
+                ATTR_FORECAST_TEMP_LOW: int(self._weatherData[k]["Night.TempLow"])
+                #ATTR_FORECAST_CONDITION: self._weatherData[k]["Night.TempLow"]
+            }
+        rez.append(forecast_entry)
+        return rez
+                
+
     @property
     def state_attributes(self):
         """Return the state attributes."""
