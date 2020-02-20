@@ -181,7 +181,8 @@ class CyprusWeather(WeatherEntity):
                 ATTR_FORECAST_TEMP_LOW: int(forecast_d[k]["Night.TempLow"])
                 #ATTR_FORECAST_CONDITION: self._weatherData[k]["Night.TempLow"]
             }
-        rez.append(forecast_entry)
+            rez.append(forecast_entry)
+        
         return rez
                 
 
