@@ -235,8 +235,8 @@ class CyprusWeather(WeatherEntity):
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         """Get the latest data"""
-        _LOGGER.debug("Get the latest data from cyprus-weather.org for %s ", self._name)
+        _LOGGER.debug("Get the latest data from cyprus-weather.org for %s ", self._city)
         
-        self._weatherData = getData(LIM)
+        self._weatherData = getData(self._city)
 
 	
