@@ -232,7 +232,7 @@ def getData(city):
     
     return weatherData
 
-_weatherData = getData( cityLink['limassol'])
+_weatherData = getData('limassol')
 pprint(_weatherData)
 
 
