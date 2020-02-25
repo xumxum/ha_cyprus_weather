@@ -10,11 +10,11 @@ from bs4 import BeautifulSoup
 BASE_URL   = 'https://www.cyprus-weather.org'
 
 cityLink = {
-    'limassol'   : 'https://www.cyprus-weather.org/limassol-weather-forecast/', 
-    'nicosia'     : 'https://www.cyprus-weather.org/nicosia-weather-forecast/', 
-    'larnaca'     : 'https://www.cyprus-weather.org/larnaca-weather-forecast/', 
-    'paphos'       : 'https://www.cyprus-weather.org/paphos-weather-forecast/', 
-    'ayia napa'   : 'https://www.cyprus-weather.org/ayia-napa-weather-forecast/'
+    'Limassol'   : 'https://www.cyprus-weather.org/limassol-weather-forecast/', 
+    'Nicosia'     : 'https://www.cyprus-weather.org/nicosia-weather-forecast/', 
+    'Larnaca'     : 'https://www.cyprus-weather.org/larnaca-weather-forecast/', 
+    'Paphos'       : 'https://www.cyprus-weather.org/paphos-weather-forecast/', 
+    'Ayia napa'   : 'https://www.cyprus-weather.org/ayia-napa-weather-forecast/'
 }
 
 """

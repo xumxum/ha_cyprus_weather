@@ -43,10 +43,12 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     name = config.get(CONF_NAME)
     city = config.get(CONF_CITY)
-    city = city.lower() #makeing sure lowercase
+    
     if not name :
         name = city
 
+    city = city.capitalize() #makeing sure lowercase   
+    
     add_entities([CyprusWeather(hass,  name, city)], True)
     _LOGGER.debug(
         "Entity created for city (%s)", city
