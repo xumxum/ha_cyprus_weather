@@ -21,9 +21,9 @@ from .cyprus_weather_org import *
 # Units
 TEMP_CELSIUS = "°C"
 TEMP_FAHRENHEIT = "°F"
-DEFAULT_NAME = "cyweather"
+DEFAULT_NAME = "cyprus"
 
-CONF_SET_CITY = "city"
+CONF_CITY = "city"
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=10)
 
  
@@ -31,8 +31,8 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
+        vol.Required(CONF_CITY): cv.string,         
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-        vol.Optional(CONF_SET_CITY): cv.string,        
     }
 )
 
@@ -42,7 +42,10 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     _LOGGER.debug("Setting up plataform %s", "cyprus_weather")
 
     name = config.get(CONF_NAME)
-    city = config.get("city")
+    city = config.get(CONF_CITY)
+    city = city.lower() #makeing sure lowercase
+    if not city:
+        name = city
 
     add_entities([CyprusWeather(hass,  name, city)], True)
     _LOGGER.debug(

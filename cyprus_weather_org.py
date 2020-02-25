@@ -8,8 +8,14 @@ from pprint import pprint
 from bs4 import BeautifulSoup
 
 BASE_URL   = 'https://www.cyprus-weather.org'
-LIM        = 'https://www.cyprus-weather.org/limassol-weather-forecast/'
 
+cityLink = {
+    'limassol'   : 'https://www.cyprus-weather.org/limassol-weather-forecast/', 
+    'nicosia'     : 'https://www.cyprus-weather.org/nicosia-weather-forecast/', 
+    'larnaca'     : 'https://www.cyprus-weather.org/larnaca-weather-forecast/', 
+    'paphos'       : 'https://www.cyprus-weather.org/paphos-weather-forecast/', 
+    'ayia napa'   : 'https://www.cyprus-weather.org/ayia-napa-weather-forecast/'
+}
 
 """
 Home assistant knows only about these states so it can map it to the icon
@@ -55,12 +61,12 @@ for key in [15, 16,  17, 41 ,  42]:
 for key in [19,  20,  21,  22,  23,  24,  43,  44]:
     conditions[key] = "snowy"    
     
-def getData(url):
-#    page = requests.get(url)
- #   content = page.content
+def getData(city):
+    page = requests.get( cityLink[city] )
+    content = page.content
 
-    with open('./lim.html', 'r') as content_file:
-        content = content_file.read()        
+#    with open('./lim.html', 'r') as content_file:
+#        content = content_file.read()        
 
     weatherData = {}
 
@@ -226,7 +232,7 @@ def getData(url):
     
     return weatherData
 
-_weatherData = getData(LIM)
+_weatherData = getData( cityLink['limassol'])
 pprint(_weatherData)
 
 
