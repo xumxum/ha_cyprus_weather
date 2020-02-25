@@ -198,6 +198,8 @@ def getData(city):
     
     #Extra summary and report strings to be sent to user and for speach i
     report = weatherData["Current.Condition"] + ", temperature is " + weatherData["Current.Temperature"]  + " degrees with maximum today " + weatherData["Forecast.Today.TempHigh"] + " degrees"
+    rainReport = ''
+    windReport = ''
     
     windspeed = int(weatherData["Current.Wind"] )
     if windspeed > 50:
@@ -220,7 +222,7 @@ def getData(city):
     for k in range(76,  101):
         rainProbdict[k] = 'very high chance of rain'
 
-    rainReport = ''
+    
     if rainChanceDay >= 50:
         rainReport = rainReport +", " + rainProbdict[rainChanceDay] + " during the day"
     if rainChanceNight >= 50:            
