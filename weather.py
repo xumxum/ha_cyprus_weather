@@ -143,14 +143,7 @@ class CyprusWeather(WeatherEntity):
             return value
         except:
             return None
-
-
-#    
-#                        ATTR_FORECAST_TIME: v["date"],
-#                    ATTR_FORECAST_TEMP: int(v["high"]),
-#                    ATTR_FORECAST_TEMP_LOW: int(v["low"]),
-#                    ATTR_FORECAST_CONDITION: self.hass.data[DATA_CONDITION][
-    
+   
     @property
     def forecast(self):
         """Return the forecast array."""
@@ -230,6 +223,7 @@ class CyprusWeather(WeatherEntity):
         #add our own custom shit
         data["forecast_temp_high"] = self._weatherData["Forecast.Today.TempHigh"]
         data["forecast_temp_low"] = self._weatherData["Forecast.Tonight.TempLow"]
+        data["report"] = self._weatherData["Report"]
         
         return data
     

@@ -56,11 +56,11 @@ for key in [19,  20,  21,  22,  23,  24,  43,  44]:
     conditions[key] = "snowy"    
     
 def getData(url):
-    page = requests.get(url)
-    content = page.content
+#    page = requests.get(url)
+ #   content = page.content
 
-#    with open('/tmp/lim.html', 'r') as content_file:
-#        content = content_file.read()        
+    with open('./lim.html', 'r') as content_file:
+        content = content_file.read()        
 
     weatherData = {}
 
@@ -106,7 +106,7 @@ def getData(url):
         #pprint(forecast_entry_s)
         hourly_forecast_time = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
         #pprint(hourly_forecast_time)
-        hourly_forecast_temperature = re.compile('/>\r\n\s+(\d+).+\r\n').findall(str(forecast_entry_s))[0]
+        hourly_forecast_temperature = re.compile('/>\r?\n\s+(\d+).+\r?\n').findall(str(forecast_entry_s))[0]
         #d = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
         #pprint(hourly_forecast_temperature)
         #forecast_hourly.append()
@@ -189,6 +189,41 @@ def getData(url):
         day_counter = day_counter+1
 
     weatherData["Forecast"] = forecast_dayly
+    
+    #Extra summary and report strings to be sent to user and for speach i
+    report = weatherData["Current.Condition"] + ", temperature is " + weatherData["Current.Temperature"]  + " degrees with maximum today " + weatherData["Forecast.Today.TempHigh"] + " degrees"
+    
+    windspeed = int(weatherData["Current.Wind"] )
+    if windspeed > 50:
+        windReport = ", very windy"
+    else:
+        if windspeed > 30:
+            windReport = ", a bit windy"
+    report = report + windReport
+    
+    rainChanceDay = int( weatherData["Forecast.Today.ChanceOfRain"] )
+    rainChanceNight = int( weatherData["Forecast.Tonight.ChanceOfRain"] )
+
+    rainProbdict = {}
+    for k in range(0, 26):
+        rainProbdict[k] = 'low chance of rain'
+    for k in range(26, 51):
+        rainProbdict[k] = 'moderate chance of rain'
+    for k in range(51,  76):
+        rainProbdict[k] = 'high chance of rain'
+    for k in range(76,  101):
+        rainProbdict[k] = 'very high chance of rain'
+
+    rainReport = ''
+    if rainChanceDay >= 50:
+        rainReport = rainReport +", " + rainProbdict[rainChanceDay] + " during the day"
+    if rainChanceNight >= 50:            
+        rainReport = rainReport +" and " + rainProbdict[rainChanceNight] + " during the night"
+    
+    report = report + rainReport
+    
+    weatherData["Report"] = report
+    
     return weatherData
 
 _weatherData = getData(LIM)
