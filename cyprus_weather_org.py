@@ -70,6 +70,9 @@ def getData(url):
     re_forecast_wind = re.compile('(\d+) km\/h')
     re_forecast_temphigh = re.compile('<div class="temp temp-high">(\d+)')
     re_forecast_templow = re.compile('<div class="temp temp-low">(\d+)')
+    #Sunrise: 06:34
+    re_sunrise = re.compile('Sunrise:\s+(\d\d:\d\d)')
+    re_sunset = re.compile('Sunset:\s+(\d\d:\d\d)')
 
     soup = BeautifulSoup(content, 'html.parser')        
     cwMain = soup.find(id="cwMain")
@@ -130,9 +133,11 @@ def getData(url):
         weatherData["Forecast." + prefix +".Wind"] = re_forecast_wind.findall(forecast_s)[0]
 
         if i == 0:
-            weatherData["Forecast." + prefix + ".TempHigh"] = re_forecast_temphigh.findall( str(today_forecast_periods[0]) )[0]            
+            weatherData["Forecast." + prefix + ".TempHigh"] = re_forecast_temphigh.findall( forecast_s )[0]            
+            weatherData["Forecast." + prefix + ".Sunrise"] = re_sunrise.findall( forecast_s )[0]            
         else:
-            weatherData["Forecast." + prefix + ".TempLow"] = re_forecast_templow.findall( str(today_forecast_periods[1]) )[0]
+            weatherData["Forecast." + prefix + ".TempLow"] = re_forecast_templow.findall( forecast_s )[0]
+            weatherData["Forecast." + prefix + ".Sunset"] = re_sunset.findall( forecast_s )[0]            
     #pprint(weatherData)
     
     #dayly_forecast = cwMain.find_all("div",class_="forecast")[0]
