@@ -1,1 +1,1 @@
-"""The cyprus_weather component."""
+"""The ha-cyprus-weather component."""
