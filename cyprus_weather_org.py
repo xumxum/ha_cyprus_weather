@@ -9,6 +9,9 @@ from bs4 import BeautifulSoup
 
 BASE_URL   = 'https://www.cyprus-weather.org'
 
+#report the rain if chance of rain is above this threshold
+REPORT_RAIN_CHANCE_THRESHOLD = 20
+
 cityLink = {
     'Limassol'   : 'https://www.cyprus-weather.org/limassol-weather-forecast/', 
     'Nicosia'     : 'https://www.cyprus-weather.org/nicosia-weather-forecast/', 
@@ -223,18 +226,20 @@ def getData(city):
         rainProbdict[k] = 'very high chance of rain'
 
     
-    if rainChanceDay >= 50:
+    if rainChanceDay >= REPORT_RAIN_CHANCE_THRESHOLD:
         rainReport = rainReport +", " + rainProbdict[rainChanceDay] + " during the day"
-    if rainChanceNight >= 50:            
+    if rainChanceNight >= REPORT_RAIN_CHANCE_THRESHOLD:            
         rainReport = rainReport +" and " + rainProbdict[rainChanceNight] + " during the night"
     
     report = report + rainReport
     
-    weatherData["Report"] = report
-    
+    weatherData["Report"] = report   
     return weatherData
+    
+#Test function     
+def test_getData():
+    _weatherData = getData('Limassol')
+    pprint(_weatherData)
 
-_weatherData = getData('Limassol')
-pprint(_weatherData)
-
+#test_getData()
 
