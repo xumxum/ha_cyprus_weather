@@ -3,11 +3,11 @@
 
 import requests
 import re
-import time
+import datetime
 
 from pprint import pprint
 from bs4 import BeautifulSoup
-from datetime import datetime
+#from datetime import datetime
 
 BASE_URL   = 'https://www.cyprus-weather.org'
 
@@ -161,6 +161,7 @@ def getData(city):
 
     forecast_dayly={}
     day_counter = 0
+    today = datetime.datetime.today()
     for day_container_entity in day_container:
         #day-date
         #pprint(day_container_entity)
@@ -170,8 +171,8 @@ def getData(city):
         #pprint(day_date_s)
         d = re.compile('<span>(.+?)\.\s*(\d+)(.+?)<').search(day_date_s)
         f_date = d.group(1) + " " + d.group(2) 
-        forecast_DateTime = time.strptime(f_date,  "%b %d")
-        now = datetime.now()
+        #forecast_DateTime = time.strptime(f_date,  "%b %d")
+        forecast_DateTime = today + datetime.timedelta(days=day_counter)
         #forecast_DateTime.tm_year = now.year
         day_forecast_dict["Date"] = forecast_DateTime
         #pprint(f_date)
