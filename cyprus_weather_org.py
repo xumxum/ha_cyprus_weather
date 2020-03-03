@@ -172,7 +172,7 @@ def getData(city):
         d = re.compile('<span>(.+?)\.\s*(\d+)(.+?)<').search(day_date_s)
         f_date = d.group(1) + " " + d.group(2) 
         #forecast_DateTime = time.strptime(f_date,  "%b %d")
-        forecast_DateTime = today + datetime.timedelta(days=day_counter)
+        forecast_DateTime = today + datetime.timedelta(days=(day_counter+1))
         #forecast_DateTime.tm_year = now.year
         day_forecast_dict["Date"] = forecast_DateTime
         #pprint(f_date)
