@@ -247,5 +247,5 @@ def test_getData():
     _weatherData = getData('Limassol')
     pprint(_weatherData)
 
-test_getData()
+#test_getData()
 
