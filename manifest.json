@@ -1,7 +1,8 @@
 {
   "domain": "cyprus_weather",
   "name": "Cyprus weather",
-  "documentation": "https://github.com/xumxum/ha-airodump-tracker",
+  "version": "1.0.1",
+  "documentation": "https://github.com/xumxum/ha-cyprus-weather",
   "requirements": [],
   "dependencies": [],
   "codeowners": []

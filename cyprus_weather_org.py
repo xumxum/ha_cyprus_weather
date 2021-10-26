@@ -15,16 +15,16 @@ BASE_URL   = 'https://www.cyprus-weather.org'
 REPORT_RAIN_CHANCE_THRESHOLD = 20
 
 cityLink = {
-    'Limassol'   : 'https://www.cyprus-weather.org/limassol-weather-forecast/', 
-    'Nicosia'     : 'https://www.cyprus-weather.org/nicosia-weather-forecast/', 
-    'Larnaca'     : 'https://www.cyprus-weather.org/larnaca-weather-forecast/', 
-    'Paphos'       : 'https://www.cyprus-weather.org/paphos-weather-forecast/', 
+    'Limassol'   : 'https://www.cyprus-weather.org/limassol-weather-forecast/',
+    'Nicosia'     : 'https://www.cyprus-weather.org/nicosia-weather-forecast/',
+    'Larnaca'     : 'https://www.cyprus-weather.org/larnaca-weather-forecast/',
+    'Paphos'       : 'https://www.cyprus-weather.org/paphos-weather-forecast/',
     'Ayia napa'   : 'https://www.cyprus-weather.org/ayia-napa-weather-forecast/'
 }
 
 """
 Home assistant knows only about these states so it can map it to the icon
-Otherwise won't display icon just the test 
+Otherwise won't display icon just the test
 Not sure where should be but better to return string then number for condition
 
 clear-night
@@ -46,32 +46,32 @@ exceptional
 conditions = {
     5:"windy",  #not clear if this is it
     32:"windy",  #not clear if this is it
-    25:"hail", 
-    26:"hail", 
-    29:"snowy-rainy", 
-    33:"clear-night", 
+    25:"hail",
+    26:"hail",
+    29:"snowy-rainy",
+    33:"clear-night",
     34:"clear-night"
 }
 
 for key in [1, 2, 30, 31,]:
     conditions[key] = "sunny"
 for key in [7, 8, 11, 37,]:
-    conditions[key] = "cloudy"    
+    conditions[key] = "cloudy"
 for key in [3, 4, 6,  35,  36,  38]:
-    conditions[key] = "partlycloudy"    
+    conditions[key] = "partlycloudy"
 for key in [12, 13, 14,  18,  39,  40]:
     conditions[key] = "rainy"
 for key in [15, 16,  17, 41 ,  42]:
-    conditions[key] = "lightning"    
+    conditions[key] = "lightning"
 for key in [19,  20,  21,  22,  23,  24,  43,  44]:
-    conditions[key] = "snowy"    
-    
+    conditions[key] = "snowy"
+
 def getData(city):
     page = requests.get( cityLink[city] )
     content = page.content
 
 #    with open('./lim.html', 'r') as content_file:
-#        content = content_file.read()        
+#        content = content_file.read()
 
     weatherData = {}
 
@@ -85,7 +85,7 @@ def getData(city):
     re_sunrise = re.compile('Sunrise:\s+(\d\d:\d\d)')
     re_sunset = re.compile('Sunset:\s+(\d\d:\d\d)')
 
-    soup = BeautifulSoup(content, 'html.parser')        
+    soup = BeautifulSoup(content, 'html.parser')
     cwMain = soup.find(id="cwMain")
 
     currentIcon_s = str(cwMain.find_all("div",class_="currentIcon")[0])
@@ -94,7 +94,7 @@ def getData(city):
     weatherData["Current.Condition"]=conditions[ int (condition_nr) ]
     weatherData["Current.OutlookIcon"]=BASE_URL + re.compile('src="(.+?)"').findall(currentIcon_s)[0]
 
-    currentTemp_s = str(cwMain.find_all("div",class_="currentTemp")[0])    
+    currentTemp_s = str(cwMain.find_all("div",class_="currentTemp")[0])
     weatherData["Current.Temperature"] = re.compile('<div class="large">(.+?)°</div>').findall(currentTemp_s)[0]
     weatherData["Current.FeelsLike"] = re.compile('<div>Feels like (.+?)°</div>').findall(currentTemp_s)[0]
 
@@ -104,12 +104,12 @@ def getData(city):
     weatherData["Current.DewPoint"] = re.compile('<th>Dew Point:</th>\s+<td>(.+?)°</td>').findall(currentDetails_s)[0]
     weatherData["Current.Visibility"] = re.compile('<th.+?Visibility:</th>\s+<td>(.+?)\s*km</td>').findall(currentDetails_s)[0]
 
-    w = re.compile('<th>Wind:</th>\s+<td title="(.+?) km/h">(\w+)').search(currentDetails_s)    
+    w = re.compile('<th>Wind:</th>\s+<td title="(.+?) km/h">(\w+)').search(currentDetails_s)
     weatherData["Current.Wind"] = w.group(1)
     weatherData["Current.WindDirection"] = w.group(2)
 
     weatherData["Current.UVIndex"] = re.compile('<th>UV Index:</th>\s+<td>(.+?)</td>').findall(currentDetails_s)[0]
-    
+
     #Hourly forecast data
     forecasts_v = cwMain.find_all("div",class_="hour")
     forecast_hourly={}
@@ -123,40 +123,40 @@ def getData(city):
         #forecast_hourly.append()
         forecast_hourly[hourly_forecast_time] = hourly_forecast_temperature
     #pprint(forecast_hourly)
-    
+
     weatherData["Forecast.Hourly"] = forecast_hourly
-    
+
     #Today forecast
     #<div class="day-forecast">
     today_forecast = cwMain.find_all("div",class_="forecast thisDay")[0]
     #first is daytime, 2nd is nighttime
-    today_forecast_periods = today_forecast.find_all("div",class_="period") 
+    today_forecast_periods = today_forecast.find_all("div",class_="period")
     prefix_v=['Day', 'Night']
 
-    
+
     prefix=""
     for i in range(2):
         forecast_s = str(today_forecast_periods[i])
         prefix = "To" + (prefix_v[i]).lower()
-                
+
         weatherData["Forecast." + prefix +".Description"] = re_forecast_description.findall(forecast_s)[0]
         weatherData["Forecast." + prefix +".ChanceOfRain"] = re_forecast_chanceofrain.findall(forecast_s)[0]
         weatherData["Forecast." + prefix +".Wind"] = re_forecast_wind.findall(forecast_s)[0]
 
         if i == 0:
-            weatherData["Forecast." + prefix + ".TempHigh"] = re_forecast_temphigh.findall( forecast_s )[0]            
-            weatherData["Forecast." + prefix + ".Sunrise"] = re_sunrise.findall( forecast_s )[0]            
+            weatherData["Forecast." + prefix + ".TempHigh"] = re_forecast_temphigh.findall( forecast_s )[0]
+            weatherData["Forecast." + prefix + ".Sunrise"] = re_sunrise.findall( forecast_s )[0]
         else:
             weatherData["Forecast." + prefix + ".TempLow"] = re_forecast_templow.findall( forecast_s )[0]
-            weatherData["Forecast." + prefix + ".Sunset"] = re_sunset.findall( forecast_s )[0]            
+            weatherData["Forecast." + prefix + ".Sunset"] = re_sunset.findall( forecast_s )[0]
     #pprint(weatherData)
-    
+
     #dayly_forecast = cwMain.find_all("div",class_="forecast")[0]
     #re.compile("itl")
-    dayly_forecast = cwMain.find_all("div",class_="forecast" )[1] #first is today forecast, ignore, was already processed 
-    
+    dayly_forecast = cwMain.find_all("div",class_="forecast" )[1] #first is today forecast, ignore, was already processed
+
     #pprint(str(dayly_forecast))
-    
+
     day_container = dayly_forecast.find_all("div",class_="day-container")
 
     forecast_dayly={}
@@ -166,20 +166,20 @@ def getData(city):
         #day-date
         #pprint(day_container_entity)
         day_forecast_dict = {}
-        
+
         day_date_s = str( day_container_entity.find_all("div",class_="day-date")[0] )
         #pprint(day_date_s)
         d = re.compile('<span>(.+?)\.\s*(\d+)(.+?)<').search(day_date_s)
-        f_date = d.group(1) + " " + d.group(2) 
+        f_date = d.group(1) + " " + d.group(2)
         #forecast_DateTime = time.strptime(f_date,  "%b %d")
         forecast_DateTime = today + datetime.timedelta(days=(day_counter+1))
         #forecast_DateTime.tm_year = now.year
         day_forecast_dict["Date"] = forecast_DateTime
         #pprint(f_date)
-        
-        day_forecast = day_container_entity.find_all("div",class_="day-forecast")[0] 
-        forecast_periods = day_forecast.find_all("div",class_="period") 
-        
+
+        day_forecast = day_container_entity.find_all("div",class_="day-forecast")[0]
+        forecast_periods = day_forecast.find_all("div",class_="period")
+
         for i in range(2):
             forecast_s = str(forecast_periods[i])
             prefix = prefix_v[i] +"."
@@ -192,24 +192,24 @@ def getData(city):
             day_forecast_dict[prefix+"ChanceOfRain"] = chanceOfRain
             day_forecast_dict[prefix+"Wind"] = wind
             day_forecast_dict[prefix+"Condition"] = conditions[ int(re_condition_nr.findall( forecast_s )[0]) ]
-            
+
             if i == 0:
                 day_forecast_dict[prefix+"TempHigh"] = re_forecast_temphigh.findall( forecast_s )[0]
-                #condition we take from day 
+                #condition we take from day
                 #day_forecast_dict[prefix+"Condition"] = conditions[ int(re_condition_nr.findall( forecast_s )[0]) ]
             else:
                 day_forecast_dict[prefix+"TempLow"] = re_forecast_templow.findall( forecast_s )[0]
-       
+
         forecast_dayly[f_date] = day_forecast_dict
         day_counter = day_counter+1
 
     weatherData["Forecast"] = forecast_dayly
-    
+
     #Extra summary and report strings to be sent to user and for speach i
     report = weatherData["Current.Condition"] + ", temperature is " + weatherData["Current.Temperature"]  + " degrees with maximum today " + weatherData["Forecast.Today.TempHigh"] + " degrees"
     rainReport = ''
     windReport = ''
-    
+
     windspeed = int(weatherData["Current.Wind"] )
     if windspeed > 50:
         windReport = ", very windy"
@@ -217,7 +217,7 @@ def getData(city):
         if windspeed > 30:
             windReport = ", a bit windy"
     report = report + windReport
-    
+
     rainChanceDay = int( weatherData["Forecast.Today.ChanceOfRain"] )
     rainChanceNight = int( weatherData["Forecast.Tonight.ChanceOfRain"] )
 
@@ -231,21 +231,21 @@ def getData(city):
     for k in range(76,  101):
         rainProbdict[k] = 'very high chance of rain'
 
-    
+
     if rainChanceDay >= REPORT_RAIN_CHANCE_THRESHOLD:
         rainReport = rainReport +", " + rainProbdict[rainChanceDay] + " during the day"
-    if rainChanceNight >= REPORT_RAIN_CHANCE_THRESHOLD:            
+    if rainChanceNight >= REPORT_RAIN_CHANCE_THRESHOLD:
         rainReport = rainReport +" and " + rainProbdict[rainChanceNight] + " during the night"
-    
+
     report = report + rainReport
-    
-    weatherData["Report"] = report   
+
+    weatherData["Report"] = report
     return weatherData
-    
-#Test function     
+
+#Test function
 def test_getData():
     _weatherData = getData('Limassol')
     pprint(_weatherData)
 
-#test_getData()
-
+if __name__ == '__main__':
+    test_getData()
