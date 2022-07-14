@@ -1,0 +1,10 @@
+{
+  "domain": "ha_cyprus_weather",
+  "name": "Cyprus weather",
+  "version": "1.0.1",
+  "documentation": "https://github.com/xumxum/ha_cyprus_weather",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": [],
+  "issue_tracker": "https://github.com/xumxum/ha_cyprus_weather/issues"
+}

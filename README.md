@@ -1,13 +1,16 @@
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+
 # ha_cyprus_weather
 Home Assistant Cyprus weather component
 
 ## Description
 Get Cyprus weather data from cyprus weather org site
 
-## Installation
-1. clone repo into your HA custom_components directory
+## Manual Installation
+1. clone repo to a working directory
 > git clone https://github.com/xumxum/ha_cyprus_weather.git
 
+2. Copy(or link) `./custom_components/ha_cyprus_weather` to your  HA custom_components directory
 
 2. Add to `configure.yaml`:
 ```yaml
