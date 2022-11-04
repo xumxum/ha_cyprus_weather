@@ -11,6 +11,7 @@ import voluptuous as vol
 from homeassistant.components.weather import *
 
 from homeassistant.const import (
+    CONF_NAME,
     CONF_MODE,
     LENGTH_MILLIMETERS,
     PRESSURE_HPA,
