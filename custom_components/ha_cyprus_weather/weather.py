@@ -23,8 +23,8 @@ from homeassistant.util import Throttle
 from .cyprus_weather_org import *
 
 # Units
-TEMP_CELSIUS = "°C"
-TEMP_FAHRENHEIT = "°F"
+#TEMP_CELSIUS = "°C"
+#TEMP_FAHRENHEIT = "°F"
 DEFAULT_NAME = "cyprus"
 
 CONF_CITY = "city"
