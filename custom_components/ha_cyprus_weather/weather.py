@@ -11,7 +11,11 @@ import voluptuous as vol
 from homeassistant.components.weather import *
 
 from homeassistant.const import (
-    CONF_NAME,
+    CONF_MODE,
+    LENGTH_MILLIMETERS,
+    PRESSURE_HPA,
+    SPEED_METERS_PER_SECOND,
+    TEMP_CELSIUS,
 )
 from homeassistant.const import PRECISION_TENTHS
 from homeassistant.util import Throttle
@@ -57,6 +61,10 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
 class CyprusWeather(WeatherEntity):
     """Representation of a weather entity."""
+    _attr_native_temperature_unit = TEMP_CELSIUS
+    _attr_native_precipitation_unit = LENGTH_MILLIMETERS
+    _attr_native_pressure_unit = PRESSURE_HPA
+    _attr_native_wind_speed_unit = SPEED_METERS_PER_SECOND
 
     def __init__(self, hass,  name, city):
         """Initialize Cyprus weather."""
@@ -78,18 +86,13 @@ class CyprusWeather(WeatherEntity):
         return self._name
 
     @property
-    def temperature(self):
+    def native_temperature(self):
         """Return the temperature."""
         try:
             value = int(self._weatherData["Current.Temperature"])
             return value
         except:
             return None
-
-    @property
-    def temperature_unit(self):
-        """Return the unit of measurement."""
-        return TEMP_CELSIUS
 
     @property
     def humidity(self):
@@ -114,7 +117,7 @@ class CyprusWeather(WeatherEntity):
             return None
 
     @property
-    def pressure(self):
+    def native_pressure(self):
         """Return the pressure."""
         try:
             value = int(self._weatherData["Current.Pressure"])
@@ -123,7 +126,7 @@ class CyprusWeather(WeatherEntity):
             return None
 
     @property
-    def wind_speed(self):
+    def native_wind_speed(self):
         """Return the wind speed."""
         try:
             value = int(self._weatherData["Current.Wind"])
@@ -141,7 +144,7 @@ class CyprusWeather(WeatherEntity):
             return None
 
     @property
-    def visibility(self):
+    def native_visibility(self):
         """Return the visibility."""
         try:
             value = int(self._weatherData["Current.Visibility"])
