@@ -175,14 +175,13 @@ class CyprusWeather(WeatherEntity):
         """Return the state attributes."""
         data = {}
         
-        # if self.temperature is not None:
-        #     data[ATTR_WEATHER_TEMPERATURE] = show_temp(
-        #         self.hass, self.temperature, self.temperature_unit, self.precision
-        #     )
+        temperature = self.native_temperature
+        if self.native_temperature is not None:
+            data[ATTR_WEATHER_TEMPERATURE] = temperature
 
-        # humidity = self.humidity
-        # if humidity is not None:
-        #     data[ATTR_WEATHER_HUMIDITY] = round(humidity)
+        humidity = self.humidity
+        if humidity is not None:
+            data[ATTR_WEATHER_HUMIDITY] = round(humidity)
 
         # ozone = self.ozone
         # if ozone is not None:
@@ -208,6 +207,10 @@ class CyprusWeather(WeatherEntity):
         # if attribution is not None:
         #     data[ATTR_WEATHER_ATTRIBUTION] = attribution
 
+        forecast = self.forecast
+        if forecast is not None:
+            data[ATTR_FORECAST] = forecast
+
         # if self.forecast is not None:
         #     forecast = []
         #     for forecast_entry in self.forecast:
@@ -230,9 +233,9 @@ class CyprusWeather(WeatherEntity):
         #     data[ATTR_FORECAST] = forecast
 
         # #add our own custom shit
-        # data["forecast_temp_high"] = self._weatherData["Forecast.Today.TempHigh"]
-        # data["forecast_temp_low"] = self._weatherData["Forecast.Tonight.TempLow"]
-        # data["report"] = self._weatherData["Report"]
+        data["forecast_temp_high"] = self._weatherData["Forecast.Today.TempHigh"]
+        data["forecast_temp_low"] = self._weatherData["Forecast.Tonight.TempLow"]
+        data["report"] = self._weatherData["Report"]
         
         return data
     
