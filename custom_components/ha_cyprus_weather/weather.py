@@ -183,58 +183,39 @@ class CyprusWeather(WeatherEntity):
         if humidity is not None:
             data[ATTR_WEATHER_HUMIDITY] = round(humidity)
 
-        # ozone = self.ozone
-        # if ozone is not None:
-        #     data[ATTR_WEATHER_OZONE] = ozone
+        ozone = self.ozone
+        if ozone is not None:
+            data[ATTR_WEATHER_OZONE] = ozone
 
-        # pressure = self.pressure
-        # if pressure is not None:
-        #     data[ATTR_WEATHER_PRESSURE] = pressure
+        pressure = self.native_pressure
+        if pressure is not None:
+            data[ATTR_WEATHER_PRESSURE] = pressure
 
-        # wind_bearing = self.wind_bearing
-        # if wind_bearing is not None:
-        #     data[ATTR_WEATHER_WIND_BEARING] = wind_bearing
+        wind_bearing = self.wind_bearing
+        if wind_bearing is not None:
+            data[ATTR_WEATHER_WIND_BEARING] = wind_bearing
 
-        # wind_speed = self.wind_speed
-        # if wind_speed is not None:
-        #     data[ATTR_WEATHER_WIND_SPEED] = wind_speed
+        wind_speed = self.native_wind_speed
+        if wind_speed is not None:
+            data[ATTR_WEATHER_WIND_SPEED] = wind_speed
 
-        # visibility = self.visibility
-        # if visibility is not None:
-        #     data[ATTR_WEATHER_VISIBILITY] = visibility
+        visibility = self.native_visibility
+        if visibility is not None:
+            data[ATTR_WEATHER_VISIBILITY] = visibility
 
-        # attribution = self.attribution
-        # if attribution is not None:
-        #     data[ATTR_WEATHER_ATTRIBUTION] = attribution
+        attribution = self.attribution
+        if attribution is not None:
+            data[ATTR_WEATHER_ATTRIBUTION] = attribution
 
         forecast = self.forecast
         if forecast is not None:
             data[ATTR_FORECAST] = forecast
 
-        # if self.forecast is not None:
-        #     forecast = []
-        #     for forecast_entry in self.forecast:
-        #         forecast_entry = dict(forecast_entry)
-        #         forecast_entry[ATTR_FORECAST_TEMP] = show_temp(
-        #             self.hass,
-        #             forecast_entry[ATTR_FORECAST_TEMP],
-        #             self.temperature_unit,
-        #             self.precision,
-        #         )
-        #         if ATTR_FORECAST_TEMP_LOW in forecast_entry:
-        #             forecast_entry[ATTR_FORECAST_TEMP_LOW] = show_temp(
-        #                 self.hass,
-        #                 forecast_entry[ATTR_FORECAST_TEMP_LOW],
-        #                 self.temperature_unit,
-        #                 self.precision,
-        #             )
-        #         forecast.append(forecast_entry)
-
-        #     data[ATTR_FORECAST] = forecast
-
-        # #add our own custom shit
+        # #add our own custom stuff
         data["forecast_temp_high"] = self._weatherData["Forecast.Today.TempHigh"]
         data["forecast_temp_low"] = self._weatherData["Forecast.Tonight.TempLow"]
+
+        #this a string report, can be used in tts speach in a morning automation for example
         data["report"] = self._weatherData["Report"]
         
         return data
