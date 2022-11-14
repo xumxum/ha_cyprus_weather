@@ -24,9 +24,6 @@ from homeassistant.util import Throttle
 from .cyprus_weather_org import *
 
 # Units
-#TEMP_CELSIUS = "°C"
-#TEMP_FAHRENHEIT = "°F"
-DEFAULT_NAME = "cyprus"
 
 CONF_CITY = "city"
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=10)
@@ -44,7 +41,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the weather entities."""
-    _LOGGER.debug("Setting up plataform %s", "cyprus_weather")
+    _LOGGER.debug("Setting up plataform %s", "ha_cyprus_weather")
 
     name = config.get(CONF_NAME)
     city = config.get(CONF_CITY)

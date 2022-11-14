@@ -21,7 +21,7 @@ weather:
      - platform: ha_cyprus_weather
        city: 'Limassol'
 ```
-Entity name will be weather.city (ex weather.nicosia), you can override it by defining optionaly the `name` parameter along the `city`
+Entity name will be `weather.city` (ex `weather.nicosia`), you can override it by defining optionaly the `name` parameter along the `city`
 
 Possible cities:
 - Nicosia
@@ -33,7 +33,7 @@ Possible cities:
 4. Restart Home Assistant of course
 
 ### B. HACS Installation
-Now this integration can alternatively be easily installed with hacs as well, more information about hacs on 
+Now this integration can alternatively be easily installed with hacs as well, this is the recommanded way. More information about hacs on 
 https://hacs.xyz/docs/basic/getting_started
 
 1. Add the repo as a custom repository in hacs  
@@ -41,7 +41,7 @@ https://hacs.xyz/docs/basic/getting_started
 
 2. Download Cyprus Weather integration in hacs
 
-3. Add the configuration part same way as in manual installation above
+3. Add the configuration part same way as in manual installation above( no GUI config )
 
 4. Restart Home Assistant
 
