@@ -120,7 +120,7 @@ def getData(city):
             #pprint(forecast_entry_s)
             hourly_forecast_time = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
             #pprint(hourly_forecast_time)
-            hourly_forecast_temperature = re.compile('/>\r?\n\s+(\d+).+\r?\n').findall(str(forecast_entry_s))[0]
+            hourly_forecast_temperature = re.compile('/>\r?\n\s+(-?\d+).+\r?\n').findall(str(forecast_entry_s))[0]
             #d = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
             #pprint(hourly_forecast_temperature)
             #forecast_hourly.append()
