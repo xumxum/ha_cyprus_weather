@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import requests
@@ -82,8 +82,8 @@ def getData(city):
         re_forecast_description = re.compile('<div class="description">(.+?)<')
         re_forecast_chanceofrain = re.compile('Chance of Rain: (\d+)%')
         re_forecast_wind = re.compile('(\d+) km\/h')
-        re_forecast_temphigh = re.compile('<div class="temp temp-high">(\d+)')
-        re_forecast_templow = re.compile('<div class="temp temp-low">(\d+)')
+        re_forecast_temphigh = re.compile('<div class="temp temp-high">(-?\d+)')
+        re_forecast_templow = re.compile('<div class="temp temp-low">(-?\d+)')
         #Sunrise: 06:34
         re_sunrise = re.compile('Sunrise:\s+(\d\d:\d\d)')
         re_sunset = re.compile('Sunset:\s+(\d\d:\d\d)')
