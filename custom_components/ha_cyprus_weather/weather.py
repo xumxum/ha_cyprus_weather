@@ -21,6 +21,17 @@ from homeassistant.const import (
 from homeassistant.const import PRECISION_TENTHS
 from homeassistant.util import Throttle
 
+
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
+from homeassistant.const import TEMP_CELSIUS
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+
 from .cyprus_weather_org import *
 
 # Units
@@ -55,6 +66,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     _LOGGER.debug(
         "Entity created for city (%s)", city
     )
+    #add_entities([ExampleSensor()])
 
 
 class CyprusWeather(WeatherEntity):
