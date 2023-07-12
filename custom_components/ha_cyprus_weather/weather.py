@@ -32,41 +32,61 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
 from .cyprus_weather_org import *
+
+from .const import DOMAIN, CONF_CITY
 
 # Units
 
-CONF_CITY = "city"
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=10)
 
  
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Required(CONF_CITY): cv.string,         
-        vol.Optional(CONF_NAME): cv.string,
-    }
-)
 
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    """Set up the weather entities."""
-    _LOGGER.debug("Setting up plataform %s", "ha_cyprus_weather")
+# def setup_platform(hass, config, add_entities, discovery_info=None):
+#     """Set up the weather entities."""
+#     _LOGGER.debug("Setting up plataform %s", "ha_cyprus_weather")
 
-    name = config.get(CONF_NAME)
-    city = config.get(CONF_CITY)
+#     name = config.get(CONF_NAME)
+#     city = config.get(CONF_CITY)
     
-    if not name :
-        name = city
+#     if not name :
+#         name = city
 
-    city = city.capitalize() #makeing sure lowercase   
+#     city = city.capitalize() #makeing sure lowercase   
     
-    add_entities([CyprusWeather(hass,  name, city)], True)
-    _LOGGER.debug(
-        "Entity created for city (%s)", city
+#     add_entities([CyprusWeather(hass,  name, city)], True)
+#     _LOGGER.debug(
+#         "Entity created for city (%s)", city
+#     )
+#     #add_entities([ExampleSensor()])
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up Cyprus weather based on a config entry."""
+    city = entry.data.get(CONF_CITY)
+    name = entry.data.get(CONF_NAME, city)
+
+    async_add_entities(
+        [
+            CyprusWeather(
+                name=name,
+                city=city
+                #coordinator=hass.data[DOMAIN][entry.entry_id],
+                #entry_id=entry.entry_id,
+            )
+        ]
     )
-    #add_entities([ExampleSensor()])
+
 
 
 class CyprusWeather(WeatherEntity):
@@ -76,13 +96,12 @@ class CyprusWeather(WeatherEntity):
     _attr_native_pressure_unit = PRESSURE_HPA
     _attr_native_wind_speed_unit = SPEED_METERS_PER_SECOND
 
-    def __init__(self, hass,  name, city):
+    def __init__(self, name, city):
         """Initialize Cyprus weather."""
         _LOGGER.debug("Creating instance of CyprusWeather, using parameters")
         _LOGGER.debug("name\t%s", name)
         _LOGGER.debug("city\t%s", city)
 
-        self.hass = hass
         self._name = name
         self._city = city
 
