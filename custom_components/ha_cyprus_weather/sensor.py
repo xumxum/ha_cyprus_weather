@@ -2,43 +2,102 @@
 from __future__ import annotations
 
 import logging
+
 from homeassistant.components.sensor import (
+    DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
     SensorEntity,
+    SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import TEMP_CELSIUS
+
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from homeassistant.const import CONF_NAME, PERCENTAGE, TEMP_CELSIUS, UnitOfSpeed
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+
+
+from .const import DEFAULT_NAME, DOMAIN, CONF_CITY
 
 from .coordinator import CyprusWeatherUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-def setup_platform(
+
+DESCRIPTIONS: list[SensorEntityDescription] = [
+    SensorEntityDescription(
+        key="Current.Temperature",
+        name="Temperature",
+        native_unit_of_measurement=TEMP_CELSIUS,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="Current.Humidity",
+        name="Humidity",
+        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.HUMIDITY, #?
+        state_class=SensorStateClass.MEASUREMENT,
+    )
+]
+
+
+async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    
-    _LOGGER.debug("Setting up sensor platform %s", "ha_cyprus_weather")
-    """Set up the sensor platform."""
-    add_entities([ExampleSensor()])
+    """Set up Cyprus Weather sensors based on a config entry."""
+    #conf_name = entry.data.get(CONF_NAME, hass.config.location_name)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    city = entry.data.get(CONF_CITY)
+
+    entities= []
+
+    # Add all meter sensors described above.
+    for description in DESCRIPTIONS:
+        entities.append(
+            WeatherSensor(
+                city=city,
+                coordinator=coordinator,
+                entry_id=entry.entry_id,
+                description=description,
+            )
+        )
+
+    async_add_entities(entities)
 
 
-class ExampleSensor(SensorEntity):
-    """Representation of a Sensor."""
 
-    _attr_name = "Example Temperature"
-    _attr_native_unit_of_measurement = TEMP_CELSIUS
-    _attr_device_class = SensorDeviceClass.TEMPERATURE
-    _attr_state_class = SensorStateClass.MEASUREMENT
+class WeatherSensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEntity):
+    """Defines a WeatherSensor ."""
 
-    def update(self) -> None:
-        """Fetch new state data for the sensor.
+    _attr_has_entity_name = True
 
-        This is the only method that should fetch new data for Home Assistant.
-        """
-        self._attr_native_value = 24
+    def __init__(
+        self,
+        city: str,
+        coordinator: CyprusWeatherUpdateCoordinator,
+        entry_id: str,
+        description: SensorEntityDescription,
+    ) -> None:
+        
+        """Initialize Weather sensor."""
+        super().__init__(coordinator=coordinator)
+
+        self.entity_id = (
+            f"{SENSOR_DOMAIN}.{city}_{description.name}".lower()
+        )
+        self.entity_description = description
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self.name}"
+        #self._attr_device_info = coordinator.device_info
+
+    @property
+    def native_value(self) -> StateType:
+        """Return the state of the sensor."""
+        return self.coordinator.get_weather_value(self.entity_description.key)
