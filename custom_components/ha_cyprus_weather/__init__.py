@@ -8,8 +8,8 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
 
-from .const import DOMAIN, NAME, VERSION
-#from .coordinator import KnmiDataUpdateCoordinator
+from .const import DOMAIN, NAME, VERSION, CONF_CITY
+from .coordinator import CyprusWeatherUpdateCoordinator
 
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
@@ -25,9 +25,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # latitude = entry.data.get(CONF_LATITUDE)
     # longitude = entry.data.get(CONF_LONGITUDE)
 
-    session = async_get_clientsession(hass)
+    #session = async_get_clientsession(hass)
     # client = KnmiApiClient(api_key, latitude, longitude, session)
 
+    city = entry.data.get(CONF_CITY)
     # device_info = DeviceInfo(
     #     entry_type=DeviceEntryType.SERVICE,
     #     identifiers={(DOMAIN, entry.entry_id)},
@@ -42,6 +43,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # )
 
     # await coordinator.async_config_entry_first_refresh()
+
+    hass.data[DOMAIN][entry.entry_id] = coordinator = CyprusWeatherUpdateCoordinator(
+        hass=hass, city=city
+    )
+
+    await coordinator.async_config_entry_first_refresh()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))

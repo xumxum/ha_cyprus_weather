@@ -35,9 +35,10 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .cyprus_weather_org import *
-
+#from .cyprus_weather_org import *
 from .const import DOMAIN, CONF_CITY
+
+from .coordinator import CyprusWeatherUpdateCoordinator
 
 # Units
 
@@ -46,25 +47,6 @@ MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=10)
  
 _LOGGER = logging.getLogger(__name__)
 
-
-
-# def setup_platform(hass, config, add_entities, discovery_info=None):
-#     """Set up the weather entities."""
-#     _LOGGER.debug("Setting up plataform %s", "ha_cyprus_weather")
-
-#     name = config.get(CONF_NAME)
-#     city = config.get(CONF_CITY)
-    
-#     if not name :
-#         name = city
-
-#     city = city.capitalize() #makeing sure lowercase   
-    
-#     add_entities([CyprusWeather(hass,  name, city)], True)
-#     _LOGGER.debug(
-#         "Entity created for city (%s)", city
-#     )
-#     #add_entities([ExampleSensor()])
 
 
 async def async_setup_entry(
@@ -79,9 +61,10 @@ async def async_setup_entry(
     async_add_entities(
         [
             CyprusWeather(
+                hass=hass,
                 name=name,
-                city=city
-                #coordinator=hass.data[DOMAIN][entry.entry_id],
+                city=city,
+                coordinator=hass.data[DOMAIN][entry.entry_id],
                 #entry_id=entry.entry_id,
             )
         ]
@@ -96,17 +79,16 @@ class CyprusWeather(WeatherEntity):
     _attr_native_pressure_unit = PRESSURE_HPA
     _attr_native_wind_speed_unit = SPEED_METERS_PER_SECOND
 
-    def __init__(self, name, city):
+    def __init__(self, hass, name, city, coordinator):
         """Initialize Cyprus weather."""
         _LOGGER.debug("Creating instance of CyprusWeather, using parameters")
         _LOGGER.debug("name\t%s", name)
         _LOGGER.debug("city\t%s", city)
 
+        self._hass = hass
         self._name = name
         self._city = city
-
-        #get initial weather data
-        self.update()
+        self._coordinator = coordinator
 
 
     @property
@@ -118,7 +100,7 @@ class CyprusWeather(WeatherEntity):
     def native_temperature(self):
         """Return the temperature."""
         try:
-            value = int(self._weatherData["Current.Temperature"])
+            value = int(self._coordinator.get_weather_value("Current.Temperature"))
             return value
         except:
             return None
@@ -127,7 +109,7 @@ class CyprusWeather(WeatherEntity):
     def humidity(self):
         """Return the humidity."""
         try:
-            value = int(self._weatherData["Current.Humidity"])
+            value = int(self._coordinator.get_weather_value("Current.Humidity"))
             return value
         except:
             return None
@@ -140,7 +122,7 @@ class CyprusWeather(WeatherEntity):
     def condition(self):
         """Return the weather condition."""
         try:
-            value = self._weatherData["Current.Condition"]
+            value = self._coordinator.get_weather_value("Current.Condition")
             return value
         except:
             return None
@@ -149,7 +131,7 @@ class CyprusWeather(WeatherEntity):
     def native_pressure(self):
         """Return the pressure."""
         try:
-            value = int(self._weatherData["Current.Pressure"])
+            value = int(self._coordinator.get_weather_value("Current.Pressure"))
             return value
         except:
             return None
@@ -158,7 +140,7 @@ class CyprusWeather(WeatherEntity):
     def native_wind_speed(self):
         """Return the wind speed."""
         try:
-            value = int(self._weatherData["Current.Wind"])
+            value = int(self._coordinator.get_weather_value("Current.Wind"))
             return value
         except:
             return None
@@ -167,7 +149,7 @@ class CyprusWeather(WeatherEntity):
     def wind_bearing(self):
         """Return the wind bearing."""
         try:
-            value = self._weatherData["Current.WindDirection"]
+            value = self._coordinator.get_weather_value("Current.WindDirection")
             return value
         except:
             return None
@@ -176,7 +158,7 @@ class CyprusWeather(WeatherEntity):
     def native_visibility(self):
         """Return the visibility."""
         try:
-            value = int(self._weatherData["Current.Visibility"])
+            value = int(self._coordinator.get_weather_value("Current.Visibility"))
             return value
         except:
             return None
@@ -185,15 +167,16 @@ class CyprusWeather(WeatherEntity):
     def forecast(self):
         """Return the forecast array."""
         rez = []
-        forecast_d = self._weatherData["Forecast"]
-        for k in forecast_d:
-            forecast_entry = {
-                ATTR_FORECAST_TIME: forecast_d[k]["Date"],
-                ATTR_FORECAST_NATIVE_TEMP: int(forecast_d[k]["Day.TempHigh"]),
-                ATTR_FORECAST_NATIVE_TEMP_LOW: int(forecast_d[k]["Night.TempLow"]), 
-                ATTR_FORECAST_CONDITION: forecast_d[k]["Day.Condition"] # we show daytime forecast condition not night?!!
-            }
-            rez.append(forecast_entry)
+        forecast_d = self._coordinator.get_weather_value("Forecast")
+        if forecast_d:
+            for k in forecast_d:
+                forecast_entry = {
+                    ATTR_FORECAST_TIME: forecast_d[k]["Date"],
+                    ATTR_FORECAST_NATIVE_TEMP: int(forecast_d[k]["Day.TempHigh"]),
+                    ATTR_FORECAST_NATIVE_TEMP_LOW: int(forecast_d[k]["Night.TempLow"]), 
+                    ATTR_FORECAST_CONDITION: forecast_d[k]["Day.Condition"] # we show daytime forecast condition not night?!!
+                }
+                rez.append(forecast_entry)
         
         return rez
                 
@@ -240,24 +223,19 @@ class CyprusWeather(WeatherEntity):
             data[ATTR_FORECAST] = forecast
 
         # #add our own custom stuff
-        data["forecast_temp_high"] = self._weatherData["Forecast.Today.TempHigh"]
-        data["forecast_temp_low"] = self._weatherData["Forecast.Tonight.TempLow"]
+        forecast_temp_high = self._coordinator.get_weather_value("Forecast.Today.TempHigh")
+        if forecast_temp_high:
+            data["forecast_temp_high"] = forecast_temp_high
+        
+        forecast_temp_low = self._coordinator.get_weather_value("Forecast.Tonight.TempLow")
+        data["forecast_temp_low"] = forecast_temp_low
 
         #this a string report, can be used in tts speach in a morning automation for example
-        data["report"] = self._weatherData["Report"]
+        report =  self._coordinator.get_weather_value("Report")
+        if report:
+            data["report"] = report
         
         return data
     
-
-    """Called every MIN_TIME_BETWEEN_UPDATES , updates the data values"""
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
-    def update(self):
-        """Get the latest data"""
-        _LOGGER.debug("Get the latest data from cyprus-weather.org for %s ", self._city)
-        new_data = getData(self._city)
-        #if we fail to scrape there will be no data showing..
-        #lets try this aproach ...if scraping failed, just leave the old data..
-        if new_data:
-            self._weatherData = new_data
 
 	

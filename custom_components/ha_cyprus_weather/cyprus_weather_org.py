@@ -67,7 +67,7 @@ for key in [15, 16,  17, 41 ,  42]:
 for key in [19,  20,  21,  22,  23,  24,  43,  44]:
     conditions[key] = "snowy"
 
-def getData(city):
+def get_weather_data(city):
     try:
 
         page = requests.get( cityLink[city] )
@@ -251,7 +251,7 @@ def getData(city):
 
 #Test function
 def test_getData():
-    _weatherData = getData('Limassol')
+    _weatherData = get_weather_data('Limassol')
     pprint(_weatherData)
 
 if __name__ == '__main__':

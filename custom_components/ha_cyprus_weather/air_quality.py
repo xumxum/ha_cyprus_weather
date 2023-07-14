@@ -57,12 +57,13 @@ parameters = {
         }
 }
 
-def getData(city):
-#    page = requests.get( BASE_URL )
-#    content = page.content
+def get_air_quality_data(city):
+    
+    page = requests.get( BASE_URL )
+    content = page.content
 
-    with open('./air_quality_full.html', 'r') as content_file:
-        content = content_file.read()
+    # with open('./air_quality_full.html', 'r') as content_file:
+    #     content = content_file.read()
 
     rez = {}
 
@@ -108,7 +109,7 @@ def getData(city):
 
 #Test function
 def test_getData():
-    _weatherData = getData('Limassol')
+    _weatherData = get_air_quality_data('Limassol')
     pprint(_weatherData)
 
 if __name__ == '__main__':
