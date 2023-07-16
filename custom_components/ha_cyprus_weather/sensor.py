@@ -29,7 +29,7 @@ from .coordinator import CyprusWeatherUpdateCoordinator
 _LOGGER = logging.getLogger(__name__)
 
 
-DESCRIPTIONS: list[SensorEntityDescription] = [
+weather_sensors: list[SensorEntityDescription] = [
     SensorEntityDescription(
         key="Current.Temperature",
         name="Temperature",
@@ -46,6 +46,17 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
     )
 ]
 
+air_quality_sensors: list[SensorEntityDescription] = [
+    SensorEntityDescription(
+        key="PM₁₀",
+        name="PM₁₀",
+        native_unit_of_measurement='µg/m³',
+        device_class=SensorDeviceClass.PM10, #?
+        state_class=SensorStateClass.MEASUREMENT,
+    )    
+]
+
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -60,13 +71,24 @@ async def async_setup_entry(
     entities= []
 
     # Add all meter sensors described above.
-    for description in DESCRIPTIONS:
+    for weather_sensor in weather_sensors:
         entities.append(
             WeatherSensor(
                 city=city,
                 coordinator=coordinator,
                 entry_id=entry.entry_id,
-                description=description,
+                description=weather_sensor,
+            )
+        )
+
+    for air_quality_sensor in air_quality_sensors:
+        entities.append(
+            AirQualitySensor(
+                city=city,
+                coordinator=coordinator,
+                entry_id=entry.entry_id,
+                description=air_quality_sensor,
+                definition='Malaka'
             )
         )
 
@@ -101,3 +123,45 @@ class WeatherSensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEnt
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
         return self.coordinator.get_weather_value(self.entity_description.key)
+
+
+
+class AirQualitySensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEntity):
+    """Defines a WeatherSensor ."""
+
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        city: str,
+        coordinator: CyprusWeatherUpdateCoordinator,
+        entry_id: str,
+        description: SensorEntityDescription,
+        definition: str,
+    ) -> None:
+        
+        """Initialize Weather sensor."""
+        super().__init__(coordinator=coordinator)
+
+        self.entity_id = (
+            f"{SENSOR_DOMAIN}.{city}_{description.name}".lower()
+        )
+        self.entity_description = description
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self.name}"
+        #self._attr_device_info = coordinator.device_info
+
+        self._attributes = {}
+        self._attributes['definition'] = definition
+
+    @property
+    def native_value(self) -> StateType:
+        """Return the state of the sensor."""
+        d = self.coordinator.get_air_quality_value(self.entity_description.key)
+        if 'value' in d:
+            return d['value']
+        return None
+    
+    @property
+    def extra_state_attributes(self):
+        """Return entity specific state attributes."""
+        return self._attributes
