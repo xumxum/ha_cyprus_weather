@@ -36,7 +36,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 #from .cyprus_weather_org import *
-from .const import DOMAIN, CONF_CITY
+from .const import DEFAULT_NAME, DOMAIN, CONF_CITY
 
 from .coordinator import CyprusWeatherUpdateCoordinator
 
@@ -65,7 +65,7 @@ async def async_setup_entry(
                 name=name,
                 city=city,
                 coordinator=hass.data[DOMAIN][entry.entry_id],
-                #entry_id=entry.entry_id,
+                entry_id=entry.entry_id,
             )
         ]
     )
@@ -79,7 +79,7 @@ class CyprusWeather(WeatherEntity):
     _attr_native_pressure_unit = PRESSURE_HPA
     _attr_native_wind_speed_unit = SPEED_METERS_PER_SECOND
 
-    def __init__(self, hass, name, city, coordinator):
+    def __init__(self, hass, name, city, coordinator, entry_id):
         """Initialize Cyprus weather."""
         _LOGGER.debug("Creating instance of CyprusWeather, using parameters")
         _LOGGER.debug("name\t%s", name)
@@ -90,6 +90,7 @@ class CyprusWeather(WeatherEntity):
         self._city = city
         self._coordinator = coordinator
 
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} "  
 
     @property
     def name(self):

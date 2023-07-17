@@ -21,10 +21,12 @@ from homeassistant.const import CONF_NAME, PERCENTAGE, TEMP_CELSIUS, UnitOfSpeed
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
+from homeassistant.util.enum import try_parse_enum
 
 from .const import DEFAULT_NAME, DOMAIN, CONF_CITY
 
 from .coordinator import CyprusWeatherUpdateCoordinator
+from .air_quality import get_air_quality_parameters
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,20 +43,34 @@ weather_sensors: list[SensorEntityDescription] = [
         key="Current.Humidity",
         name="Humidity",
         native_unit_of_measurement=PERCENTAGE,
-        device_class=SensorDeviceClass.HUMIDITY, #?
+        device_class=SensorDeviceClass.HUMIDITY, 
         state_class=SensorStateClass.MEASUREMENT,
-    )
+    ),
+    SensorEntityDescription(
+        key="Current.Pressure",
+        name="Pressure",
+        native_unit_of_measurement='hPa',
+        device_class=SensorDeviceClass.PRESSURE, 
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="Current.Wind",
+        name="Wind Speed",
+        native_unit_of_measurement='km/h',
+        device_class=SensorDeviceClass.WIND_SPEED, #?
+        state_class=SensorStateClass.MEASUREMENT,
+    )        
 ]
 
-air_quality_sensors: list[SensorEntityDescription] = [
-    SensorEntityDescription(
-        key="PM₁₀",
-        name="PM₁₀",
-        native_unit_of_measurement='µg/m³',
-        device_class=SensorDeviceClass.PM10, #?
-        state_class=SensorStateClass.MEASUREMENT,
-    )    
-]
+# air_quality_sensors: list[SensorEntityDescription] = [
+#     SensorEntityDescription(
+#         key="PM₁₀",
+#         name="PM₁₀",
+#         native_unit_of_measurement='µg/m³',
+#         device_class=SensorDeviceClass.PM10, #?
+#         state_class=SensorStateClass.MEASUREMENT,
+#     )    
+# ]
 
 
 
@@ -81,16 +97,30 @@ async def async_setup_entry(
             )
         )
 
+    # for air_quality_sensor in air_quality_sensors:
+    #     entities.append(
+    #         AirQualitySensor(
+    #             city=city,
+    #             coordinator=coordinator,
+    #             entry_id=entry.entry_id,
+    #             description=air_quality_sensor,
+    #             definition='Malaka'
+    #         )
+    #     )
+
+
+    air_quality_sensors = get_air_quality_parameters()
+
     for air_quality_sensor in air_quality_sensors:
-        entities.append(
-            AirQualitySensor(
-                city=city,
-                coordinator=coordinator,
-                entry_id=entry.entry_id,
-                description=air_quality_sensor,
-                definition='Malaka'
+            entities.append(
+                AirQualitySensor(
+                    city=city,
+                    coordinator=coordinator,
+                    entry_id=entry.entry_id,
+                    name = air_quality_sensor,
+                    description=air_quality_sensors[air_quality_sensor],
+                )
             )
-        )
 
     async_add_entities(entities)
 
@@ -116,7 +146,7 @@ class WeatherSensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEnt
             f"{SENSOR_DOMAIN}.{city}_{description.name}".lower()
         )
         self.entity_description = description
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self.name}"
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self.name}"        
         #self._attr_device_info = coordinator.device_info
 
     @property
@@ -129,39 +159,58 @@ class WeatherSensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEnt
 class AirQualitySensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEntity):
     """Defines a WeatherSensor ."""
 
-    _attr_has_entity_name = True
+    #_attr_has_entity_name = True
 
     def __init__(
         self,
         city: str,
         coordinator: CyprusWeatherUpdateCoordinator,
         entry_id: str,
-        description: SensorEntityDescription,
-        definition: str,
+        name: str,
+        description: dict
     ) -> None:
         
         """Initialize Weather sensor."""
         super().__init__(coordinator=coordinator)
 
+        self._name = name
+
         self.entity_id = (
-            f"{SENSOR_DOMAIN}.{city}_{description.name}".lower()
+            f"{SENSOR_DOMAIN}.{city}_{name}".lower()
         )
-        self.entity_description = description
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self.name}"
-        #self._attr_device_info = coordinator.device_info
+
+        self.description = description
+
+        self.entity_description = SensorEntityDescription(
+            key = self._name,
+            name=self._name,
+            native_unit_of_measurement = self.description['unit_of_measurement'],
+            device_class = try_parse_enum(SensorDeviceClass, description['device_class']),
+            state_class=SensorStateClass.MEASUREMENT,
+        )  
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self._name}"
+        
+        #self._attr_device_class = try_parse_enum(SensorDeviceClass, description['device_class'])
+        #self._attr_native_unit_of_measurement = self.entity_description['unit_of_measurement']
 
         self._attributes = {}
-        self._attributes['definition'] = definition
+        self._attributes['description'] = description['description']
+
+        _LOGGER.debug(f"Setting up AirQualitySensor: name: {self._name} key: {self.entity_description.key} device_class: {self.entity_description.device_class}")
 
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
         d = self.coordinator.get_air_quality_value(self.entity_description.key)
-        if 'value' in d:
+        if d and 'value' in d:
             return d['value']
         return None
-    
+
+        
     @property
     def extra_state_attributes(self):
         """Return entity specific state attributes."""
+        d = self.coordinator.get_air_quality_value(self.entity_description.key)
+        if d and 'polution_level' in d:
+            self._attributes['polution_level'] = d['polution_level']
         return self._attributes
