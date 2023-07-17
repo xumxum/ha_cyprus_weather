@@ -17,14 +17,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from homeassistant.const import CONF_NAME, PERCENTAGE, TEMP_CELSIUS, UnitOfSpeed
+from homeassistant.const import CONF_NAME, PERCENTAGE, TEMP_CELSIUS
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+
 
 from homeassistant.util.enum import try_parse_enum
 
 from .const import DEFAULT_NAME, DOMAIN, CONF_CITY
-
 from .coordinator import CyprusWeatherUpdateCoordinator
 from .air_quality import get_air_quality_parameters
 
@@ -62,17 +61,6 @@ weather_sensors: list[SensorEntityDescription] = [
     )        
 ]
 
-# air_quality_sensors: list[SensorEntityDescription] = [
-#     SensorEntityDescription(
-#         key="PM₁₀",
-#         name="PM₁₀",
-#         native_unit_of_measurement='µg/m³',
-#         device_class=SensorDeviceClass.PM10, #?
-#         state_class=SensorStateClass.MEASUREMENT,
-#     )    
-# ]
-
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -80,7 +68,6 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Cyprus Weather sensors based on a config entry."""
-    #conf_name = entry.data.get(CONF_NAME, hass.config.location_name)
     coordinator = hass.data[DOMAIN][entry.entry_id]
     city = entry.data.get(CONF_CITY)
 
@@ -97,18 +84,7 @@ async def async_setup_entry(
             )
         )
 
-    # for air_quality_sensor in air_quality_sensors:
-    #     entities.append(
-    #         AirQualitySensor(
-    #             city=city,
-    #             coordinator=coordinator,
-    #             entry_id=entry.entry_id,
-    #             description=air_quality_sensor,
-    #             definition='Malaka'
-    #         )
-    #     )
-
-
+    # Add the Air Quality sensors from the file 
     air_quality_sensors = get_air_quality_parameters()
 
     for air_quality_sensor in air_quality_sensors:
@@ -146,8 +122,9 @@ class WeatherSensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEnt
             f"{SENSOR_DOMAIN}.{city}_{description.name}".lower()
         )
         self.entity_description = description
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self.name}"        
-        #self._attr_device_info = coordinator.device_info
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self.name}"
+
+        _LOGGER.debug(f"Setting up WeatherSensor: name: {description.name} key: {description.key} device_class: {self.entity_description.device_class}")      
 
     @property
     def native_value(self) -> StateType:
@@ -157,7 +134,7 @@ class WeatherSensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEnt
 
 
 class AirQualitySensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEntity):
-    """Defines a WeatherSensor ."""
+    """Defines a AirQualitySensor ."""
 
     #_attr_has_entity_name = True
 
@@ -170,7 +147,7 @@ class AirQualitySensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], Sensor
         description: dict
     ) -> None:
         
-        """Initialize Weather sensor."""
+        """Initialize AirQualitySensor."""
         super().__init__(coordinator=coordinator)
 
         self._name = name
@@ -190,9 +167,6 @@ class AirQualitySensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], Sensor
         )  
         self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self._name}"
         
-        #self._attr_device_class = try_parse_enum(SensorDeviceClass, description['device_class'])
-        #self._attr_native_unit_of_measurement = self.entity_description['unit_of_measurement']
-
         self._attributes = {}
         self._attributes['description'] = description['description']
 

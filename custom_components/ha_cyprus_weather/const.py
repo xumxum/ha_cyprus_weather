@@ -4,7 +4,6 @@ from datetime import timedelta
 # Base component constants.
 NAME = "Cyprus Weather"
 DOMAIN = "ha_cyprus_weather"
-VERSION = "1.0.0"
 
 CONF_CITY = "city"
 

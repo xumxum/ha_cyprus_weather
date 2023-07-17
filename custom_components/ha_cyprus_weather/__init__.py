@@ -2,13 +2,10 @@
 
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, Platform
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.device_registry import DeviceEntryType
-from homeassistant.helpers.entity import DeviceInfo
 
-from .const import DOMAIN, NAME, VERSION, CONF_CITY
+from .const import DOMAIN, NAME, CONF_CITY
 from .coordinator import CyprusWeatherUpdateCoordinator
 
 PLATFORMS: list[Platform] = [
@@ -21,28 +18,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
     hass.data.setdefault(DOMAIN, {})
 
-    # api_key = entry.data.get(CONF_API_KEY)
-    # latitude = entry.data.get(CONF_LATITUDE)
-    # longitude = entry.data.get(CONF_LONGITUDE)
-
-    #session = async_get_clientsession(hass)
-    # client = KnmiApiClient(api_key, latitude, longitude, session)
-
     city = entry.data.get(CONF_CITY)
-    # device_info = DeviceInfo(
-    #     entry_type=DeviceEntryType.SERVICE,
-    #     identifiers={(DOMAIN, entry.entry_id)},
-    #     manufacturer=NAME,
-    #     name=NAME,
-    #     model=VERSION,
-    #     configuration_url=API_CONF_URL,
-    # )
-
-    # hass.data[DOMAIN][entry.entry_id] = coordinator = KnmiDataUpdateCoordinator(
-    #     hass=hass, client=client, device_info=device_info
-    # )
-
-    # await coordinator.async_config_entry_first_refresh()
 
     hass.data[DOMAIN][entry.entry_id] = coordinator = CyprusWeatherUpdateCoordinator(
         hass=hass, city=city
