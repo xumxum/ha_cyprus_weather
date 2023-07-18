@@ -163,14 +163,21 @@ def get_air_quality_all(city=''):
                 if field_name:
                     field_name = field_name[0].encode().decode('unicode-escape').encode('latin1').decode('utf-8')
                     field_value = re_polutant_value.findall( str(field) )
-                    if len(field_value): 
+
+                    #print(f'field_valueB = {field_value}')
+                    if len(field_value) == 1: 
                         field_value = field_value[0]
                         try:
                             field_value = float(field_value)
                             if field_name == 'CO': #convert to ppm by diving with 1000
                                 field_value = field_value / 1000.0
-                        except ValueError:
+                        except Exception as ex:
+                            print("Exception: ", ex)
                             continue
+                    else:
+                        continue
+
+                    #print(f'field_valueA = {field_value}')
                     d={}
                     d['value'] = field_value
                     polution_level = 0
