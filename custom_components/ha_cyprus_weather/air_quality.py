@@ -98,19 +98,28 @@ def get_air_quality_parameters():
     return parameters
 
 def get_air_quality_data(city):
+    (measurements, _) = get_air_quality_all(city)
+    return measurements
+
+def get_air_quality_stations():
+    (_, stations) = get_air_quality_all()
+    return stations
+
+
+def get_air_quality_all(city=''):
     
     page = requests.get( BASE_URL )
     content = page.content
 
-    text_file = open("/tmp/air_quality.html", "w")
-    text_file.write(str(content))
-    text_file.close()
+    # text_file = open("/tmp/air_quality.html", "w")
+    # text_file.write(str(content))
+    # text_file.close()
 
     # with open('./air_quality_full.html', 'r') as content_file:
     #     content = content_file.read()
 
     rez = {}
-
+    rez_station_names = []
     """
     <div class="views-field views-field-field-pollutant-38"><div class="field-content">
     <span class="pollutant-green">
@@ -131,14 +140,17 @@ def get_air_quality_data(city):
 
     re_polutant_label = re.compile('<span class=".*?pollutant-label">(.+?):<')
     re_polutant_value = re.compile('<span class=".*?pollutant-value">([+-]?[0-9]*[.]?[0-9]+)')
+    
+    #<h4 class="field-content stations-overview-title">Limassol - Traffic Station</h4>
+    re_station_name = re.compile('<h4 class=".*?stations-overview-title">(.+?)<')
     #<span class="pollutant-label">PM₂.₅:</span>
     #Sunrise: 06:34
 
 
     soup = BeautifulSoup(content, 'html.parser')
-    stations = soup.find_all("div", class_="views-row")
-    for station in stations:
-        if city in str(station):
+    stations_sections = soup.find_all("div", class_="views-row")
+    for station in stations_sections:
+        if city and city in str(station):
             #span class="field-content 
             #print(str(station))
             #print("**************************************************")
@@ -178,11 +190,22 @@ def get_air_quality_data(city):
                     
                     rez[field_name] = d
                     
+    #<h4 class="field-content stations-overview-title">Limassol - Traffic Station</h4>
+    stations = soup.find_all("h4", class_="stations-overview-title")
+    for station in stations:
+        finds = re_station_name.findall( str(station) )
+        if finds:
+            station_name = str(finds[0])
+            #print(f"Station: {station_name}")
+            rez_station_names.append(station_name)
 
-    return rez
+    return (rez,rez_station_names)
 
 #Test function
 def test_getData():
+    _stations = get_air_quality_stations()
+    pprint(_stations)
+    print("****************************************")
     _weatherData = get_air_quality_data('Limassol')
     pprint(_weatherData)
 

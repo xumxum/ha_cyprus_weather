@@ -19,6 +19,7 @@ _LOGGER: logging.Logger = logging.getLogger(__package__)
 WEATHER_KEY = 'weather'
 AIR_QUALITY_KEY = 'air_quality'
 
+
 class CyprusWeatherUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data"""
 
@@ -26,9 +27,6 @@ class CyprusWeatherUpdateCoordinator(DataUpdateCoordinator):
 
     def __init__( self, hass: HomeAssistant,  city ) -> None:
         """Initialize."""
-        #self.api = client
-        #self.device_info = device_info
-
 
         self._city = city
         self._hass = hass

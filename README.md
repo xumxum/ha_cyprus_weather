@@ -4,7 +4,10 @@
 Home Assistant Cyprus weather integration
 
 ## Description
-Get Cyprus weather data from cyprus weather org site and display it in Home Assistant as a weather integration including forecast data.
+Get Cyprus weather data from cyprus weather org site and display it in Home Assistant as a weather integration including forecast data and outside air quality.
+
+## Upgrade
+Remove all configurations from `configuration.yaml`, addon now fully GUI configured. Also addon now creates additional sensors for temperature, humidity, wind speed and pressure, so remove all template sensors in case you added them, now it's automatic :)
 
 ## Installation
 Integration can be installed manually by manually copying the integration to the custom_integration folder, or alternatively installed with HACS
@@ -15,13 +18,11 @@ Integration can be installed manually by manually copying the integration to the
 
 2. Copy(or link) `./custom_components/ha_cyprus_weather` to your  HA custom_components directory
 
-3. Add to `configure.yaml`:
-```yaml
-weather:
-     - platform: ha_cyprus_weather
-       city: 'Limassol'
-```
-Entity name will be `weather.city` (ex `weather.nicosia`), you can override it by defining optionaly the `name` parameter along the `city`
+3. Restart Home Assistant
+ 
+4. Search & Add the `Cyprus Weather` integration in Settings/Integration and configure the city.
+
+Entity name will be `weather.city` (ex `weather.nicosia`)
 
 Possible cities:
 - Nicosia
@@ -30,9 +31,7 @@ Possible cities:
 - Paphos
 - Ayia Napa
 
-4. Restart Home Assistant of course
-
-### B. HACS Installation
+### B. HACS Installation (Recommended)
 Now this integration can alternatively be easily installed with hacs as well, this is the recommanded way. More information about hacs on 
 https://hacs.xyz/docs/basic/getting_started
 
@@ -41,9 +40,10 @@ https://hacs.xyz/docs/basic/getting_started
 
 2. Download Cyprus Weather integration in hacs
 
-3. Add the configuration part same way as in manual installation above( no GUI config )
+3. Restart Home Assistant
 
-4. Restart Home Assistant
+4. Search & Add the `Cyprus Weather` integration in Settings/Integration and configure the city.
+
 
 ## Notes
 

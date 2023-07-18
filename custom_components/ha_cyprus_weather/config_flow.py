@@ -13,8 +13,8 @@ from .const import DOMAIN, CONF_CITY
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
-class KnmiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for knmi."""
+class CyprusWeatherConfigFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+    """Config flow for Cyprus Weather."""
 
     VERSION = 1
 

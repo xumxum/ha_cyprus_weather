@@ -82,8 +82,8 @@ class CyprusWeather(WeatherEntity):
     def __init__(self, hass, name, city, coordinator, entry_id):
         """Initialize Cyprus weather."""
         _LOGGER.debug("Creating instance of CyprusWeather, using parameters")
-        _LOGGER.debug("name\t%s", name)
-        _LOGGER.debug("city\t%s", city)
+        _LOGGER.debug(f"name: {name} city: {city} entry_id: {entry_id}")
+        
 
         self._hass = hass
         self._name = name
