@@ -79,6 +79,9 @@ class CyprusWeather(WeatherEntity):
     _attr_native_pressure_unit = PRESSURE_HPA
     _attr_native_wind_speed_unit = SPEED_METERS_PER_SECOND
 
+    _attr_supported_features = WeatherEntityFeature.FORECAST_DAILY
+    #_attr_supported_features = WeatherEntityFeature.FORECAST_HOURLY
+
     def __init__(self, hass, name, city, coordinator, entry_id):
         """Initialize Cyprus weather."""
         _LOGGER.debug("Creating instance of CyprusWeather, using parameters")
@@ -164,23 +167,41 @@ class CyprusWeather(WeatherEntity):
         except:
             return None
    
-    @property
-    def forecast(self):
-        """Return the forecast array."""
+
+    async def async_forecast_daily(self) -> list[Forecast] | None:
+        """Return the daily forecast in native units.        
+        """
         rez = []
         forecast_d = self._coordinator.get_weather_value("Forecast")
         if forecast_d:
             for k in forecast_d:
                 forecast_entry = {
-                    ATTR_FORECAST_TIME: forecast_d[k]["Date"],
-                    ATTR_FORECAST_NATIVE_TEMP: int(forecast_d[k]["Day.TempHigh"]),
-                    ATTR_FORECAST_NATIVE_TEMP_LOW: int(forecast_d[k]["Night.TempLow"]), 
+                    ATTR_FORECAST_TIME: forecast_d[k]["Date"].isoformat(),
+                    ATTR_FORECAST_TEMP: int(forecast_d[k]["Day.TempHigh"]),
+                    ATTR_FORECAST_TEMP_LOW: int(forecast_d[k]["Night.TempLow"]), 
+
                     ATTR_FORECAST_CONDITION: forecast_d[k]["Day.Condition"] # we show daytime forecast condition not night?!!
                 }
                 rez.append(forecast_entry)
         
         return rez
-                
+
+    async def async_forecast_hourly(self) -> list[Forecast] | None:
+        """Return the hourly forecast in native units.
+        """
+        rez = []
+        forecast_v = self._coordinator.get_weather_value("Forecast.Hourly")
+        if forecast_v:
+            for hourly_forecast in forecast_v:
+                forecast_entry = {
+                    ATTR_FORECAST_TIME: hourly_forecast["Date"].isoformat(),
+                    ATTR_FORECAST_TEMP: int(hourly_forecast["Temp"]),
+                    #ATTR_FORECAST_CONDITION: forecast_d[k]["Day.Condition"] # we show daytime forecast condition not night?!!
+                }
+                rez.append(forecast_entry)
+        
+        return rez
+
 
     @property
     def state_attributes(self):
@@ -219,9 +240,9 @@ class CyprusWeather(WeatherEntity):
         if attribution is not None:
             data[ATTR_WEATHER_ATTRIBUTION] = attribution
 
-        forecast = self.forecast
-        if forecast is not None:
-            data[ATTR_FORECAST] = forecast
+        # forecast = self.forecast
+        # if forecast is not None:
+        #     data[ATTR_FORECAST] = forecast
 
         # #add our own custom stuff
         forecast_temp_high = self._coordinator.get_weather_value("Forecast.Today.TempHigh")

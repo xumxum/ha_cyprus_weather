@@ -115,19 +115,36 @@ def get_weather_data(city):
 
         #Hourly forecast data
         forecasts_v = cwMain.find_all("div",class_="hour")
-        forecast_hourly={}
+        hourly_forecasts=[]
+        today = datetime.datetime.today()
+        next_day = False
         for forecast_entry_s in forecasts_v:
             #pprint(forecast_entry_s)
-            hourly_forecast_time = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
+            hourly_forecast_time = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0].strip()
+            h, m = hourly_forecast_time.split(':')
+            h = int(h)
+            m = int(m)
+            forecast_datetime = today.replace(minute=m, hour=h, second=0, microsecond=0)
+            if h==0 and m==0:
+                next_day = True
+            if next_day:
+                forecast_datetime = forecast_datetime + datetime.timedelta(days=1)
             #pprint(hourly_forecast_time)
             hourly_forecast_temperature = re.compile('/>\r?\n\s+(-?\d+).+\r?\n').findall(str(forecast_entry_s))[0]
             #d = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
             #pprint(hourly_forecast_temperature)
             #forecast_hourly.append()
-            forecast_hourly[hourly_forecast_time] = hourly_forecast_temperature
-        #pprint(forecast_hourly)
+            #forecast_hourly[hourly_forecast_time] = hourly_forecast_temperature
 
-        weatherData["Forecast.Hourly"] = forecast_hourly
+            hourly_forecast = {
+                "Date":forecast_datetime,
+                "Temp":hourly_forecast_temperature
+            }
+            hourly_forecasts.append(hourly_forecast)
+
+        #pprint(hourly_forecasts)
+
+        weatherData["Forecast.Hourly"] = hourly_forecasts
 
         #Today forecast
         #<div class="day-forecast">
