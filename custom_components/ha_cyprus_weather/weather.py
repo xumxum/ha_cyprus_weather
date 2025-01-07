@@ -13,10 +13,6 @@ from homeassistant.components.weather import *
 from homeassistant.const import (
     CONF_NAME,
     CONF_MODE,
-    LENGTH_MILLIMETERS,
-    PRESSURE_HPA,
-    SPEED_METERS_PER_SECOND,
-    TEMP_CELSIUS,
 )
 from homeassistant.const import PRECISION_TENTHS
 from homeassistant.util import Throttle
@@ -27,7 +23,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import TEMP_CELSIUS
+from homeassistant.const import UnitOfTemperature, UnitOfLength, UnitOfPressure, UnitOfSpeed
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -74,10 +70,10 @@ async def async_setup_entry(
 
 class CyprusWeather(WeatherEntity):
     """Representation of a weather entity."""
-    _attr_native_temperature_unit = TEMP_CELSIUS
-    _attr_native_precipitation_unit = LENGTH_MILLIMETERS
-    _attr_native_pressure_unit = PRESSURE_HPA
-    _attr_native_wind_speed_unit = SPEED_METERS_PER_SECOND
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_native_precipitation_unit = UnitOfLength.MILLIMETERS
+    _attr_native_pressure_unit = UnitOfPressure.HPA
+    _attr_native_wind_speed_unit = UnitOfSpeed.METERS_PER_SECOND
 
     _attr_supported_features = WeatherEntityFeature.FORECAST_DAILY
     #_attr_supported_features = WeatherEntityFeature.FORECAST_HOURLY

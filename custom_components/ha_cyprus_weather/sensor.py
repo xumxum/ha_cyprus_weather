@@ -17,7 +17,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from homeassistant.const import CONF_NAME, PERCENTAGE, TEMP_CELSIUS
+from homeassistant.const import CONF_NAME, PERCENTAGE
+from homeassistant.const import UnitOfTemperature
 from homeassistant.core import HomeAssistant
 
 
@@ -34,7 +35,7 @@ weather_sensors: list[SensorEntityDescription] = [
     SensorEntityDescription(
         key="Current.Temperature",
         name="Temperature",
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
