@@ -136,9 +136,15 @@ def get_weather_data(city):
             #forecast_hourly.append()
             #forecast_hourly[hourly_forecast_time] = hourly_forecast_temperature
 
+            hourly_condition = conditions[ int(re_condition_nr.findall( str(forecast_entry_s) )[0]) ]
+            #x = re_condition_nr.findall( str(forecast_entry_s) )[0]
+            #print(f'forecast_entry_s = {forecast_entry_s}')
+            #print(f'hourly_condition = {hourly_condition}')
+
             hourly_forecast = {
                 "Date":forecast_datetime,
-                "Temp":hourly_forecast_temperature
+                "Temp":hourly_forecast_temperature,
+                "Condition":hourly_condition
             }
             hourly_forecasts.append(hourly_forecast)
 

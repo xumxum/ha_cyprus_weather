@@ -75,8 +75,7 @@ class CyprusWeather(WeatherEntity):
     _attr_native_pressure_unit = UnitOfPressure.HPA
     _attr_native_wind_speed_unit = UnitOfSpeed.METERS_PER_SECOND
 
-    _attr_supported_features = WeatherEntityFeature.FORECAST_DAILY
-    #_attr_supported_features = WeatherEntityFeature.FORECAST_HOURLY
+    _attr_supported_features = WeatherEntityFeature.FORECAST_DAILY | WeatherEntityFeature.FORECAST_HOURLY
 
     def __init__(self, hass, name, city, coordinator, entry_id):
         """Initialize Cyprus weather."""
@@ -192,7 +191,7 @@ class CyprusWeather(WeatherEntity):
                 forecast_entry = {
                     ATTR_FORECAST_TIME: hourly_forecast["Date"].isoformat(),
                     ATTR_FORECAST_TEMP: int(hourly_forecast["Temp"]),
-                    #ATTR_FORECAST_CONDITION: forecast_d[k]["Day.Condition"] # we show daytime forecast condition not night?!!
+                    ATTR_FORECAST_CONDITION: hourly_forecast["Condition"]
                 }
                 rez.append(forecast_entry)
         
