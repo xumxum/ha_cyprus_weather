@@ -48,6 +48,6 @@ https://hacs.xyz/docs/basic/getting_started
 ## Notes
 
 
-For all the information it returns check the state attributes in developer section.
+For all the information it returns check all the sensors in the integration section and the `weather.city` attributes in the developer section.
 
 The `report` attribute is a weather report for the day, with current temperature, wind and rain forecasting (if it is foreseen) that can be sent to the user or used in a text-to-speach automation(for ex in the morning)
