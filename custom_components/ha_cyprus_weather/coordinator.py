@@ -65,7 +65,7 @@ class CyprusWeatherUpdateCoordinator(DataUpdateCoordinator):
         if self.data and WEATHER_KEY in self.data and key in self.data[WEATHER_KEY]:
             return self.data[WEATHER_KEY].get(key, None)
 
-        _LOGGER.warning("Value %s is missing in API response", key)
+        _LOGGER.debug("Value %s is missing in API response", key)
         return None
     
     def get_air_quality_value( self, key: str ) -> float | int | str | None:
