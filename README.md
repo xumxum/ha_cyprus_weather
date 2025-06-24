@@ -2,6 +2,7 @@
 
 # ha_cyprus_weather
 Home Assistant Cyprus weather integration
+![alt text](https://github.com/xumxum/ha_cyprus_weather/blob/devel/limassol.jpeg?raw=true)
 
 ## Description
 Get Cyprus weather data from cyprus weather org site and display it in Home Assistant as a weather integration including forecast data and outside air quality.
@@ -51,3 +52,7 @@ https://hacs.xyz/docs/basic/getting_started
 For all the information it returns check all the sensors in the integration section and the `weather.city` attributes in the developer section.
 
 The `report` attribute is a weather report for the day, with current temperature, wind and rain forecasting (if it is foreseen) that can be sent to the user or used in a text-to-speach automation(for ex in the morning)
+
+![alt text](https://github.com/xumxum/ha_cyprus_weather/blob/devel/entities.jpeg?raw=true)
+
+![alt text](https://github.com/xumxum/ha_cyprus_weather/blob/devel/attributes.jpeg?raw=true)
