@@ -7,5 +7,6 @@
   "dependencies": [],
   "codeowners": ["xumxum"],
   "issue_tracker": "https://github.com/xumxum/ha_cyprus_weather/issues",
-  "config_flow": true
+  "config_flow": true,
+  "icon": "mdi:weather-sunny"
 }
