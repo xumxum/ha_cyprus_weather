@@ -2,7 +2,8 @@
 
 # ha_cyprus_weather
 Home Assistant Cyprus weather integration
-![alt text](https://github.com/xumxum/ha_cyprus_weather/blob/devel/limassol.jpeg?raw=true)
+
+![screenshot](screenshot/limassol.jpeg)
 
 ## Description
 Get Cyprus weather data from cyprus weather org site and display it in Home Assistant as a weather integration including forecast data and outside air quality.
