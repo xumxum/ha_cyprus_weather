@@ -72,5 +72,5 @@ class CyprusWeatherUpdateCoordinator(DataUpdateCoordinator):
         if self.data and AIR_QUALITY_KEY in self.data and key in self.data[AIR_QUALITY_KEY]:
             return self.data[AIR_QUALITY_KEY].get(key, None)
 
-        _LOGGER.warning("Value %s is missing in API response", key)
+        _LOGGER.debug("Value %s is missing in API response", key)
         return None    
