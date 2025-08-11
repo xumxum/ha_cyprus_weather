@@ -4,6 +4,9 @@
 
 ![Preview](screenshots/limassol.jpeg)
 
+## Overview
+This integration provides real-time weather and air quality data for Cyprus cities directly in Home Assistant. It fetches data from the official Cyprus weather organization and displays it with forecast and sensor details. Simple setup and automatic updates make it easy to use.
+
 ## Description
 Get Cyprus weather data from cyprus weather org site and display it in Home Assistant as a weather integration including forecast data and outside air quality.
 
@@ -27,12 +30,22 @@ https://hacs.xyz/docs/basic/getting_started
 
 Entity name will be `weather.city` (ex `weather.nicosia`)
 
-Possible cities:
-- Nicosia
-- Limassol
-- Larnaca
-- Paphos
-- Ayia Napa
+
+## Usage Example
+Once installed and configured, you can use the weather entity in your dashboard or automations:
+
+```yaml
+automation:
+   - alias: "Morning Weather Report"
+      trigger:
+         - platform: time
+            at: "07:00:00"
+      action:
+         - service: tts.google_translate_say
+            data:
+               entity_id: media_player.living_room_speaker
+               message: "Today's weather: {{ state_attr('weather.nicosia', 'report') }}"
+```
 
 
 ### B. Manual Installation
@@ -62,3 +75,6 @@ The `report` attribute is a weather report for the day, with current temperature
 ![Entities](screenshots/entities.jpeg)
 
 ![Attributes](screenshots/attributes.jpeg)
+
+## Support
+For issues or feature requests, open an issue on [GitHub](https://github.com/xumxum/ha_cyprus_weather/issues).
