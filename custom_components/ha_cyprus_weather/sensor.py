@@ -59,7 +59,14 @@ weather_sensors: list[SensorEntityDescription] = [
         native_unit_of_measurement='km/h',
         device_class=SensorDeviceClass.WIND_SPEED, #?
         state_class=SensorStateClass.MEASUREMENT,
-    )        
+    ),
+    SensorEntityDescription(
+        key="Current.FeelsLike",
+        name="Feels Like",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    )
 ]
 
 
