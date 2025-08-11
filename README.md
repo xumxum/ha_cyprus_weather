@@ -30,22 +30,12 @@ https://hacs.xyz/docs/basic/getting_started
 
 Entity name will be `weather.city` (ex `weather.nicosia`)
 
-
-## Usage Example
-Once installed and configured, you can use the weather entity in your dashboard or automations:
-
-```yaml
-automation:
-   - alias: "Morning Weather Report"
-      trigger:
-         - platform: time
-            at: "07:00:00"
-      action:
-         - service: tts.google_translate_say
-            data:
-               entity_id: media_player.living_room_speaker
-               message: "Today's weather: {{ state_attr('weather.nicosia', 'report') }}"
-```
+Possible cities:
+- Nicosia
+- Limassol
+- Larnaca
+- Paphos
+- Ayia Napa
 
 
 ### B. Manual Installation
@@ -68,7 +58,18 @@ Remove all configurations from `configuration.yaml`, addon now fully GUI configu
 For all the information it returns check all the sensors in the integration section and the `weather.city` attributes in the developer section.
 
 The `report` attribute is a weather report for the day, with current temperature, wind and rain forecasting (if it is foreseen) that can be sent to the user or used in a text-to-speach automation(for ex in the morning)
-
+```yaml
+automation:
+   - alias: "Morning Weather Report"
+      trigger:
+         - platform: time
+            at: "07:00:00"
+      action:
+         - service: tts.google_translate_say
+            data:
+               entity_id: media_player.living_room_speaker
+               message: "Today's weather: {{ state_attr('weather.nicosia', 'report') }}"
+```
 
 ## Screenshots
 
