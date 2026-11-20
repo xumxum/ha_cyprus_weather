@@ -78,40 +78,40 @@ def get_weather_data(city):
 
         weatherData = {}
 
-        re_condition_nr = re.compile('(\d+)\.svg')
-        re_forecast_description = re.compile('<div class="description">(.+?)<')
-        re_forecast_chanceofrain = re.compile('Chance of Rain: (\d+)%')
-        re_forecast_wind = re.compile('(\d+) km\/h')
-        re_forecast_temphigh = re.compile('<div class="temp temp-high">(-?\d+)')
-        re_forecast_templow = re.compile('<div class="temp temp-low">(-?\d+)')
+        re_condition_nr = re.compile(r'(\d+)\.svg')
+        re_forecast_description = re.compile(r'<div class="description">(.+?)<')
+        re_forecast_chanceofrain = re.compile(r'Chance of Rain: (\d+)%')
+        re_forecast_wind = re.compile(r'(\d+) km\/h')
+        re_forecast_temphigh = re.compile(r'<div class="temp temp-high">(-?\d+)')
+        re_forecast_templow = re.compile(r'<div class="temp temp-low">(-?\d+)')
         #Sunrise: 06:34
-        re_sunrise = re.compile('Sunrise:\s+(\d\d:\d\d)')
-        re_sunset = re.compile('Sunset:\s+(\d\d:\d\d)')
+        re_sunrise = re.compile(r'Sunrise:\s+(\d\d:\d\d)')
+        re_sunset = re.compile(r'Sunset:\s+(\d\d:\d\d)')
 
         soup = BeautifulSoup(content, 'html.parser')
         cwMain = soup.find(id="cwMain")
 
         currentIcon_s = str(cwMain.find_all("div",class_="currentIcon")[0])
-        weatherData["Current.Description"]=(re.compile('alt="(.+?)"').findall(currentIcon_s)[0]).lower()
+        weatherData["Current.Description"]=(re.compile(r'alt="(.+?)"').findall(currentIcon_s)[0]).lower()
         condition_nr = re_condition_nr.findall(currentIcon_s)[0]
         weatherData["Current.Condition"]=conditions[ int (condition_nr) ]
-        weatherData["Current.OutlookIcon"]=BASE_URL + re.compile('src="(.+?)"').findall(currentIcon_s)[0]
+        weatherData["Current.OutlookIcon"]=BASE_URL + re.compile(r'src="(.+?)"').findall(currentIcon_s)[0]
 
         currentTemp_s = str(cwMain.find_all("div",class_="currentTemp")[0])
-        weatherData["Current.Temperature"] = re.compile('<div class="large">(.+?)°</div>').findall(currentTemp_s)[0]
-        weatherData["Current.FeelsLike"] = re.compile('<div>Feels like (.+?)°</div>').findall(currentTemp_s)[0]
+        weatherData["Current.Temperature"] = re.compile(r'<div class="large">(.+?)°</div>').findall(currentTemp_s)[0]
+        weatherData["Current.FeelsLike"] = re.compile(r'<div>Feels like (.+?)°</div>').findall(currentTemp_s)[0]
 
         currentDetails_s = str(cwMain.find_all("div",class_="currentDetails")[0])
-        weatherData["Current.Humidity"] = re.compile('<th>Humidity:</th>\s+<td>(.+?)%</td>').findall(currentDetails_s)[0]
-        weatherData["Current.Pressure"] = re.compile('<th>Pressure:</th>\s+<td>(.+?)\s*hPa</td>').findall(currentDetails_s)[0]
-        weatherData["Current.DewPoint"] = re.compile('<th>Dew Point:</th>\s+<td>(.+?)°</td>').findall(currentDetails_s)[0]
-        weatherData["Current.Visibility"] = re.compile('<th.+?Visibility:</th>\s+<td>(.+?)\s*km</td>').findall(currentDetails_s)[0]
+        weatherData["Current.Humidity"] = re.compile(r'<th>Humidity:</th>\s+<td>(.+?)%</td>').findall(currentDetails_s)[0]
+        weatherData["Current.Pressure"] = re.compile(r'<th>Pressure:</th>\s+<td>(.+?)\s*hPa</td>').findall(currentDetails_s)[0]
+        weatherData["Current.DewPoint"] = re.compile(r'<th>Dew Point:</th>\s+<td>(.+?)°</td>').findall(currentDetails_s)[0]
+        weatherData["Current.Visibility"] = re.compile(r'<th.+?Visibility:</th>\s+<td>(.+?)\s*km</td>').findall(currentDetails_s)[0]
 
-        w = re.compile('<th>Wind:</th>\s+<td title="(.+?) km/h">(\w+)').search(currentDetails_s)
+        w = re.compile(r'<th>Wind:</th>\s+<td title="(.+?) km/h">(\w+)').search(currentDetails_s)
         weatherData["Current.Wind"] = w.group(1)
         weatherData["Current.WindDirection"] = w.group(2)
 
-        weatherData["Current.UVIndex"] = re.compile('<th>UV Index:</th>\s+<td>(.+?)</td>').findall(currentDetails_s)[0]
+        weatherData["Current.UVIndex"] = re.compile(r'<th>UV Index:</th>\s+<td>(.+?)</td>').findall(currentDetails_s)[0]
 
         #Hourly forecast data
         forecasts_v = cwMain.find_all("div",class_="hour")
@@ -120,7 +120,7 @@ def get_weather_data(city):
         next_day = False
         for forecast_entry_s in forecasts_v:
             #pprint(forecast_entry_s)
-            hourly_forecast_time = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0].strip()
+            hourly_forecast_time = re.compile(r'>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0].strip()
             h, m = hourly_forecast_time.split(':')
             h = int(h)
             m = int(m)
@@ -130,7 +130,7 @@ def get_weather_data(city):
             if next_day:
                 forecast_datetime = forecast_datetime + datetime.timedelta(days=1)
             #pprint(hourly_forecast_time)
-            hourly_forecast_temperature = re.compile('/>\r?\n\s+(-?\d+).+\r?\n').findall(str(forecast_entry_s))[0]
+            hourly_forecast_temperature = re.compile(r'/>\r?\n\s+(-?\d+).+\r?\n').findall(str(forecast_entry_s))[0]
             #d = re.compile('>\s*(.+?)\s*<').findall(str(forecast_entry_s))[0]
             #pprint(hourly_forecast_temperature)
             #forecast_hourly.append()
@@ -195,7 +195,7 @@ def get_weather_data(city):
 
             day_date_s = str( day_container_entity.find_all("div",class_="day-date")[0] )
             #pprint(day_date_s)
-            d = re.compile('<span>(.+?)\.\s*(\d+)(.+?)<').search(day_date_s)
+            d = re.compile(r'<span>(.+?)\.\s*(\d+)(.+?)<').search(day_date_s)
             f_date = d.group(1) + " " + d.group(2)
             #forecast_DateTime = time.strptime(f_date,  "%b %d")
             forecast_DateTime = today + datetime.timedelta(days=(day_counter+1))
