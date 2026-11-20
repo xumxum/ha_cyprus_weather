@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import logging
 
+from distro import name
+
 from homeassistant.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
@@ -126,11 +128,11 @@ class WeatherSensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], SensorEnt
         """Initialize Weather sensor."""
         super().__init__(coordinator=coordinator)
 
-        self.entity_id = (
-            f"{SENSOR_DOMAIN}.{city}_{description.name}".lower()
-        )
         self.entity_description = description
+        # Keep the exact same unique_id format before overriding _attr_name
         self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self.name}"
+        # HA will auto-generate entity_id as sensor.{slugify(f"{city} {description.name}")} -> sensor.nicosia_wind_speed
+        self._attr_name = f"{city} {description.name}"
 
         _LOGGER.debug(f"Setting up WeatherSensor: name: {description.name} key: {description.key} device_class: {self.entity_description.device_class}")      
 
@@ -159,22 +161,19 @@ class AirQualitySensor(CoordinatorEntity[CyprusWeatherUpdateCoordinator], Sensor
         super().__init__(coordinator=coordinator)
 
         self._name = name
-
-        self.entity_id = (
-            f"{SENSOR_DOMAIN}.{city}_{name}".lower()
-        )
+        self._attr_name = f"{city} {name}"
 
         self.description = description
 
         self.entity_description = SensorEntityDescription(
-            key = self._name,
+            key=self._name,
             name=self._name,
-            native_unit_of_measurement = self.description['unit_of_measurement'],
-            device_class = try_parse_enum(SensorDeviceClass, description['device_class']),
+            native_unit_of_measurement=self.description['unit_of_measurement'],
+            device_class=try_parse_enum(SensorDeviceClass, description['device_class']),
             state_class=SensorStateClass.MEASUREMENT,
-        )  
+        )
         self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {city} {self._name}"
-        
+
         self._attributes = {}
         self._attributes['description'] = description['description']
 
