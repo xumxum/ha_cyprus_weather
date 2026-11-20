@@ -1,7 +1,7 @@
 {
   "domain": "ha_cyprus_weather",
   "name": "Cyprus weather",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "documentation": "https://github.com/xumxum/ha_cyprus_weather",
   "requirements": ["beautifulsoup4"],
   "dependencies": [],
